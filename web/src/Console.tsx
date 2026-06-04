@@ -124,25 +124,32 @@ export default function Console({ bundle, onBack }: { bundle: Bundle; onBack: ()
           <Bezel><Player c={c} /></Bezel>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-12">
+        {/* findings + right rail */}
+        <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-12">
           <div className="md:col-span-7">
             <SectionLabel>findings · traced to evidence</SectionLabel>
             <div className="space-y-5">
               {c.findings.length === 0
-                ? <Bezel><div className="p-8 text-center font-serif text-lg italic text-trust-high">No evil. Evidence held up under scrutiny.</div></Bezel>
+                ? <Bezel><div className="p-10 text-center font-serif text-xl italic text-trust-high">No evil. Evidence held up under scrutiny.</div></Bezel>
                 : c.findings.map((f, i) => <FindingCard key={i} f={f} i={i} />)}
             </div>
           </div>
-          <div className="space-y-5 md:col-span-5">
+          <div className="space-y-6 md:col-span-5">
             <div><SectionLabel>self-correction trace</SectionLabel><Bezel><CorrectionTimeline corrections={c.corrections} /></Bezel></div>
             <div><SectionLabel>evidence trust hierarchy</SectionLabel><Bezel><TrustHierarchy artifacts={c.artifacts} /></Bezel></div>
           </div>
-          <div className="md:col-span-7">
-            <SectionLabel>contradiction graph · forged vs trusted</SectionLabel><Bezel><ContradictionGraph c={c} /></Bezel>
-          </div>
-          <div className="md:col-span-5">
-            <SectionLabel>audit trail · finding → tool exec</SectionLabel><Bezel><ProvenanceTable artifacts={c.artifacts} /></Bezel>
-          </div>
+        </div>
+
+        {/* contradiction graph — full width */}
+        <div className="mt-16">
+          <SectionLabel>contradiction graph · forged vs trusted</SectionLabel>
+          <Bezel><ContradictionGraph c={c} /></Bezel>
+        </div>
+
+        {/* audit trail — full width */}
+        <div className="mt-16">
+          <SectionLabel>audit trail · every finding → tool exec + hash</SectionLabel>
+          <Bezel><ProvenanceTable artifacts={c.artifacts} /></Bezel>
         </div>
 
         <div className="mt-10">

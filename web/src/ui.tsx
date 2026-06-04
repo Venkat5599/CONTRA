@@ -181,79 +181,80 @@ export function CorrectionTimeline({ corrections }: { corrections: Correction[] 
   );
 }
 
-/* ── Contradiction graph (SVG): trusted vs distrusted, evil edge ────── */
+/* ── Contradiction graph — clean full-width "forged vs trusted" rows ──── */
 export function ContradictionGraph({ c }: { c: Case }) {
-  const f = c.findings;
-  const W = 520, rowH = 92, H = Math.max(160, f.length * rowH + 40);
   return (
-    <div className="overflow-x-auto p-6">
-      <svg width={W} height={H} className="min-w-[520px]">
-        {f.map((finding, i) => {
-          const y = 40 + i * rowH;
-          return (
-            <g key={i}>
-              {/* distrusted node (left, forgeable) */}
-              <motion.g initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.08 }}>
-                <circle cx={70} cy={y} r={26} fill="var(--color-trust-low)" fillOpacity={0.12}
-                  stroke="var(--color-trust-low)" strokeOpacity={0.5} />
-                <text x={70} y={y - 34} textAnchor="middle" className="fill-white/45"
-                  style={{ font: "500 10px JetBrains Mono" }}>forged</text>
-                {/* evil contradiction edge */}
-                <motion.line x1={96} y1={y} x2={W - 96} y2={y}
-                  stroke="var(--color-evil)" strokeWidth={2} strokeDasharray="5 5"
-                  initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 0.9, delay: 0.2 + i * 0.08, ease: fluid }} />
-                <rect x={W / 2 - 52} y={y - 12} width={104} height={24} rx={12}
-                  fill="var(--color-evil)" fillOpacity={0.15} />
-                <text x={W / 2} y={y + 4} textAnchor="middle" className="fill-current"
-                  style={{ font: "600 10px JetBrains Mono", fill: "var(--color-evil)" }}>
-                  {finding.technique.split(" ")[0]}
-                </text>
-                {/* trusted node (right, hard to forge) */}
-                <circle cx={W - 70} cy={y} r={26} fill="var(--color-trust-high)" fillOpacity={0.12}
-                  stroke="var(--color-trust-high)" strokeOpacity={0.5} />
-                <text x={W - 70} y={y - 34} textAnchor="middle" className="fill-white/45"
-                  style={{ font: "500 10px JetBrains Mono" }}>trusted</text>
-                <text x={70} y={y + 44} textAnchor="middle" className="fill-white/40"
-                  style={{ font: "400 9px JetBrains Mono" }}>{finding.distrusted_source.split(":").pop()}</text>
-                <text x={W - 70} y={y + 44} textAnchor="middle" className="fill-white/40"
-                  style={{ font: "400 9px JetBrains Mono" }}>{finding.trusted_source.split(":").pop()}</text>
-              </motion.g>
-            </g>
-          );
-        })}
-      </svg>
+    <div className="space-y-5 p-7">
+      {/* column legend */}
+      <div className="flex items-center justify-between pb-1 font-mono text-[10px] uppercase tracking-[0.18em]">
+        <span className="text-trust-low">forged · distrusted</span>
+        <span className="text-white/25">contradiction</span>
+        <span className="text-trust-high">trusted · believed</span>
+      </div>
+
+      {c.findings.map((f, i) => (
+        <Reveal key={i} delay={i * 0.08}>
+          <div className="flex items-center gap-3">
+            {/* forged source node */}
+            <div className="flex w-[34%] items-center gap-2.5">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-trust-low/12 ring-1 ring-trust-low/40 font-mono text-[11px] text-trust-low">✕</span>
+              <span className="truncate font-mono text-[12px] text-white/55">
+                {f.distrusted_source.split(":").pop()}
+              </span>
+            </div>
+
+            {/* animated contradiction edge + technique */}
+            <div className="relative flex flex-1 items-center">
+              <motion.span className="h-px flex-1 bg-gradient-to-r from-trust-low/50 via-evil/60 to-trust-high/50"
+                initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
+                style={{ transformOrigin: "left" }}
+                transition={{ duration: 0.9, ease: fluid, delay: 0.2 + i * 0.08 }} />
+              <span className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-evil/15 px-2.5 py-0.5 font-mono text-[10px] text-evil ring-1 ring-evil/25">
+                {f.technique.split(" ")[0]}
+              </span>
+            </div>
+
+            {/* trusted source node */}
+            <div className="flex w-[34%] items-center justify-end gap-2.5">
+              <span className="truncate text-right font-mono text-[12px] text-white/70">
+                {f.trusted_source.split(":").pop()}
+              </span>
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-trust-high/12 ring-1 ring-trust-high/40 font-mono text-[11px] text-trust-high">✓</span>
+            </div>
+          </div>
+        </Reveal>
+      ))}
     </div>
   );
 }
 
-/* ── Provenance table (the audit trail) ─────────────────────────────── */
+/* ── Provenance audit trail — row cards, long commands handled cleanly ── */
 export function ProvenanceTable({ artifacts }: { artifacts: Artifact[] }) {
   return (
-    <div className="overflow-x-auto p-6">
-      <table className="w-full text-left font-mono text-[12px]">
-        <thead>
-          <tr className="text-white/40">
-            <th className="pb-3 font-medium">artifact</th>
-            <th className="pb-3 font-medium">tool</th>
-            <th className="pb-3 font-medium">trust</th>
-            <th className="pb-3 font-medium">command</th>
-            <th className="pb-3 font-medium">sha-256</th>
-          </tr>
-        </thead>
-        <tbody>
-          {artifacts.map((a, i) => (
-            <tr key={i} className="border-t border-white/5 text-white/65">
-              <td className="py-2 pr-4">{a.artifact_type}</td>
-              <td className="py-2 pr-4 text-white/45">{a.source_tool}</td>
-              <td className="py-2 pr-4" style={{ color: trustColor(a.trust) }}>{a.trust.toFixed(2)}</td>
-              <td className="py-2 pr-4 text-white/45">{a.raw_cmd.join(" ")}</td>
-              <td className="py-2 text-white/30">{(a.evidence_sha256 || "—").slice(0, 12)}…</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="grid grid-cols-1 gap-2 p-5 md:grid-cols-2">
+      {artifacts.map((a, i) => (
+        <Reveal key={i} delay={i * 0.03}>
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.015] px-4 py-3 transition-colors hover:bg-white/[0.03]">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 truncate">
+                <span className="font-mono text-[12px] text-white/80">{a.artifact_type}</span>
+                <span className="truncate font-mono text-[11px] text-white/35">{a.source_tool}</span>
+              </div>
+              <span className="shrink-0 rounded-md px-1.5 py-0.5 font-mono text-[11px] tabular-nums"
+                style={{ color: trustColor(a.trust), background: `${trustColor(a.trust)}14` }}>
+                {a.trust.toFixed(2)}
+              </span>
+            </div>
+            <div className="mt-2 flex items-center gap-2 overflow-hidden">
+              <span className="shrink-0 font-mono text-[11px] text-white/25">$</span>
+              <code className="truncate font-mono text-[11px] text-white/45">{a.raw_cmd.join(" ")}</code>
+              <span className="ml-auto shrink-0 font-mono text-[10px] text-white/25">
+                {a.evidence_sha256 ? `sha ${a.evidence_sha256.slice(0, 10)}…` : "—"}
+              </span>
+            </div>
+          </div>
+        </Reveal>
+      ))}
     </div>
   );
 }
