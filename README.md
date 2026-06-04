@@ -6,6 +6,8 @@
 >
 > SANS **Find Evil!** submission · Architecture pattern #2 (Custom MCP Server) · MIT.
 
+**Live console:** https://contra-dfir.vercel.app · **Repo:** https://github.com/Venkat5599/CONTRA
+
 ---
 
 ## The one-sentence thesis
