@@ -340,6 +340,37 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
         </div>
       </section>
 
+      {/* FINAL CTA */}
+      <section className="border-t border-graphite/15">
+        <div className="mx-auto max-w-[1180px] px-5 py-28 text-center md:px-8 md:py-40">
+          <Up>
+            <h2 className="mx-auto max-w-[16ch] font-display text-[10vw] font-semibold uppercase leading-[0.9] tracking-[-0.03em] text-graphite md:text-[6rem]">
+              Find evil at machine speed.
+            </h2>
+          </Up>
+          <Up delay={0.08}>
+            <p className="mx-auto mt-7 max-w-xl font-display text-[17px] text-stone">
+              Not a bigger model — a better way for the agent to doubt. Deterministic trust
+              math under an LLM's judgment. Two-command install. Runs on SIFT today.
+            </p>
+          </Up>
+          <Up delay={0.14}>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Magnetic onClick={onLaunch}
+                className="group flex items-center gap-2 rounded-full bg-graphite py-3.5 pl-7 pr-3 font-display text-[16px] text-paper">
+                Launch the console
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-paper/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1">↗</span>
+              </Magnetic>
+              <a href="https://github.com/Venkat5599/CONTRA" target="_blank" rel="noreferrer"
+                className="group flex items-center gap-2 rounded-full border border-graphite/25 py-3.5 pl-7 pr-3 font-display text-[16px] text-graphite transition-colors hover:bg-graphite/5">
+                View the repo
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-graphite/10 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1">↗</span>
+              </a>
+            </div>
+          </Up>
+        </div>
+      </section>
+
       {/* CREDITS / footer */}
       <section className="border-t border-graphite/15">
         <div className="mx-auto max-w-[1180px] px-5 py-16 md:px-8">
@@ -349,6 +380,10 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
             <div><div className="text-graphite">architecture</div><div className="mt-1">read-only MCP · pattern #2</div></div>
             <div><div className="text-graphite">toolchain</div><div className="mt-1">volatility3 · Eric Zimmerman tools</div></div>
             <div><div className="text-graphite">license</div><div className="mt-1">MIT · open source</div></div>
+          </div>
+          <div className="mt-10 flex flex-wrap gap-x-8 gap-y-2 font-mono text-[12px]">
+            <a href="https://github.com/Venkat5599/CONTRA" target="_blank" rel="noreferrer" className="text-accent hover:underline">github.com/Venkat5599/CONTRA ↗</a>
+            <a href="https://contra-dfir.vercel.app" className="text-accent hover:underline">contra-dfir.vercel.app ↗</a>
           </div>
           <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-graphite/15 pt-6 font-mono text-[11px] text-stone md:flex-row">
             <span>COPYRIGHT © 2026 CONTRA REPORT</span>
