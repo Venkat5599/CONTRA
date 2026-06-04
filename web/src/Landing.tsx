@@ -34,22 +34,25 @@ function Up({ children, delay = 0 }: { children: React.ReactNode; delay?: number
 
 interface Ch { n: string; kicker: string; title: string[]; stat: string; body: string; quote: string; }
 
-/* Sticky stacking card — pins at top; the next chapter scrolls up and covers it.
-   The outgoing card scales down + dims slightly for depth (the "deck" feel). */
+/* Sticky stacking card — direct sibling; pins at top:0, the NEXT card scrolls up
+   and covers it (deck effect). The covered card scales/dims for depth. */
 function StackedChapter({ ch, index, total }: { ch: Ch; index: number; total: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  // as the NEXT card covers this one, push this one back in z-depth
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.93]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.35]);
+  // track this card travelling out of the viewport top as the next covers it
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "start -100%"] });
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
+  const filter = useTransform(scrollYProgress, [0, 1], ["brightness(1)", "brightness(0.55)"]);
   const isLast = index === total - 1;
   const tint = index % 2 === 0 ? "bg-paper" : "bg-paper-2";
 
   return (
-    <div ref={ref} className="h-[100dvh]" style={{ zIndex: index + 1 }}>
-      <motion.div
-        style={{ scale: isLast ? 1 : scale, opacity: isLast ? 1 : opacity }}
-        className={`sticky top-0 flex h-[100dvh] items-center overflow-hidden border-t border-graphite/15 ${tint}`}>
+    <motion.div ref={ref}
+      style={{
+        scale: isLast ? 1 : scale,
+        filter: isLast ? "none" : filter,
+        zIndex: index + 1,
+      }}
+      className={`sticky top-0 flex h-[100dvh] items-center overflow-hidden border-t border-graphite/15 ${tint}`}>
         <div className="mx-auto w-full max-w-[1180px] px-5 md:px-8">
           <div className="flex items-start gap-6 md:gap-12">
             <span className="mt-2 font-mono text-[15px] text-accent">{ch.n}</span>
@@ -84,8 +87,7 @@ function StackedChapter({ ch, index, total }: { ch: Ch; index: number; total: nu
             ))}
           </div>
         </div>
-      </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
