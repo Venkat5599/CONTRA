@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "contra": {
+      "command": "contra-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}
