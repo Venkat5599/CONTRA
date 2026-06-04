@@ -8,6 +8,7 @@ import {
 import {
   TrustLadder, ArchitectureFlow, GuardrailSplit, IterationTimeline, BigSection,
 } from "./ui2";
+import Player from "./Player";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return <div className="mb-4 font-mono text-[12px] uppercase tracking-[0.18em] text-white/40">{children}</div>;
@@ -75,6 +76,12 @@ export default function Console({ bundle, onBack }: { bundle: Bundle; onBack: ()
             </div>
           </Bezel>
         </motion.div>
+
+        {/* Investigation Player — watch the agent reason + self-correct live */}
+        <div className="mt-6">
+          <SectionLabel>▶ investigation replay · watch it catch the lie</SectionLabel>
+          <Bezel><Player c={c} /></Bezel>
+        </div>
 
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-12">
           <div className="md:col-span-7">

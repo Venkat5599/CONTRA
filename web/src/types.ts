@@ -50,6 +50,22 @@ export interface Score {
   recall: number;
 }
 
+export interface ReplayStep {
+  kind: "plan" | "observe" | "correct";
+  iteration?: number;
+  tool?: string;
+  artifact_type?: string;
+  trust?: number;
+  parse_ok?: boolean;
+  evidence_sha256?: string;
+  rule?: string;
+  technique?: string;
+  trusted?: string;
+  distrusted?: string;
+  pivot?: string;
+  text: string;
+}
+
 export interface Case {
   name: string;
   verdict: string;
@@ -58,6 +74,7 @@ export interface Case {
   artifacts: Artifact[];
   corrections: Correction[];
   timeline: TimelineStep[];
+  replay: ReplayStep[];
   score: Score;
   report_md: string;
 }

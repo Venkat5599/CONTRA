@@ -65,6 +65,30 @@ def export_case(case_dir: Path) -> dict:
         "trust": r.get("trust"), "technique": r.get("technique"),
     } for r in trace if r["event"] in ("plan", "observe", "CORRECT")]
 
+    # Ordered replay steps for the Investigation Player — each step is one beat
+    # the agent took, with human narration. Drives the "watch it think" view.
+    replay: list[dict] = []
+    for r in trace:
+        ev = r["event"]
+        if ev == "plan":
+            replay.append({"kind": "plan", "iteration": r.get("iteration"),
+                           "tool": r.get("tool"),
+                           "text": r.get("rationale") or f"run {r.get('tool')}"})
+        elif ev == "observe":
+            replay.append({"kind": "observe", "iteration": r.get("iteration"),
+                           "tool": r.get("tool"),
+                           "artifact_type": r.get("artifact_type"),
+                           "trust": r.get("trust"), "parse_ok": r.get("parse_ok", True),
+                           "evidence_sha256": (r.get("evidence_sha256") or "")[:12],
+                           "text": f"{r.get('artifact_type')} · trust {r.get('trust')}"})
+        elif ev == "CORRECT":
+            replay.append({"kind": "correct", "iteration": r.get("iteration"),
+                           "rule": r.get("rule"), "technique": r.get("technique"),
+                           "trusted": r.get("trusted"), "distrusted": r.get("distrusted"),
+                           "pivot": r.get("pivot"),
+                           "text": f"contradiction — believe {r.get('trusted')}, "
+                                   f"{r.get('distrusted')} is forged"})
+
     return {
         "name": case_dir.name,
         "verdict": "MALICIOUS ACTIVITY CONFIRMED" if findings else "NO EVIL FOUND",
@@ -73,6 +97,7 @@ def export_case(case_dir: Path) -> dict:
         "artifacts": artifacts,
         "corrections": corrections,
         "timeline": timeline,
+        "replay": replay,
         "score": score.to_dict(),
         "report_md": build_report(state, trace, case_dir.name),
     }

@@ -368,6 +368,166 @@
           "technique": null
         }
       ],
+      "replay": [
+        {
+          "kind": "plan",
+          "iteration": 1,
+          "tool": "get_mft_record",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 1,
+          "tool": "get_mft_record",
+          "artifact_type": "mft_fn_timestamp",
+          "trust": 0.9,
+          "parse_ok": true,
+          "evidence_sha256": "a55cc9c21643",
+          "text": "mft_fn_timestamp \u00b7 trust 0.9"
+        },
+        {
+          "kind": "correct",
+          "iteration": 1,
+          "rule": "R1",
+          "technique": "T1070.006 Indicator Removal: Timestomp",
+          "trusted": "MFTECmd:$FILE_NAME",
+          "distrusted": "MFTECmd:$STANDARD_INFORMATION",
+          "pivot": "confirm real execution time via get_prefetch / get_amcache",
+          "text": "contradiction \u2014 believe MFTECmd:$FILE_NAME, MFTECmd:$STANDARD_INFORMATION is forged"
+        },
+        {
+          "kind": "plan",
+          "iteration": 2,
+          "tool": "list_memory_procs",
+          "text": "offline-planner: deterministic step for 'confirm real execution time via get_prefetch / g'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 2,
+          "tool": "list_memory_procs",
+          "artifact_type": "memory_proc",
+          "trust": 0.95,
+          "parse_ok": true,
+          "evidence_sha256": "1a5b051ea6a7",
+          "text": "memory_proc \u00b7 trust 0.95"
+        },
+        {
+          "kind": "correct",
+          "iteration": 2,
+          "rule": "R2",
+          "technique": "T1055 Process Injection / fileless execution",
+          "trusted": "volatility3.pslist",
+          "distrusted": "filesystem",
+          "pivot": "dump process with memory tools; check netscan for C2 socket",
+          "text": "contradiction \u2014 believe volatility3.pslist, filesystem is forged"
+        },
+        {
+          "kind": "plan",
+          "iteration": 3,
+          "tool": "get_amcache",
+          "text": "offline-planner: deterministic step for 'confirm real execution time via get_prefetch / g'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 3,
+          "tool": "get_amcache",
+          "artifact_type": "amcache",
+          "trust": 0.8,
+          "parse_ok": true,
+          "evidence_sha256": "e9fd4d95f019",
+          "text": "amcache \u00b7 trust 0.8"
+        },
+        {
+          "kind": "plan",
+          "iteration": 4,
+          "tool": "get_prefetch",
+          "text": "offline-planner: deterministic step for 'confirm real execution time via get_prefetch / g'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 4,
+          "tool": "get_prefetch",
+          "artifact_type": "prefetch",
+          "trust": 0.8,
+          "parse_ok": true,
+          "evidence_sha256": "b8a6c0e8d792",
+          "text": "prefetch \u00b7 trust 0.8"
+        },
+        {
+          "kind": "plan",
+          "iteration": 5,
+          "tool": "get_usnjrnl",
+          "text": "offline-planner: deterministic step for 'confirm real execution time via get_prefetch / g'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 5,
+          "tool": "get_usnjrnl",
+          "artifact_type": "usnjrnl",
+          "trust": 0.85,
+          "parse_ok": true,
+          "evidence_sha256": "9c0b724fb922",
+          "text": "usnjrnl \u00b7 trust 0.85"
+        },
+        {
+          "kind": "plan",
+          "iteration": 6,
+          "tool": "get_srum",
+          "text": "offline-planner: deterministic step for 'confirm real execution time via get_prefetch / g'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 6,
+          "tool": "get_srum",
+          "artifact_type": "srum",
+          "trust": 0.78,
+          "parse_ok": true,
+          "evidence_sha256": "a285e5cebc8b",
+          "text": "srum \u00b7 trust 0.78"
+        },
+        {
+          "kind": "plan",
+          "iteration": 7,
+          "tool": "get_eventlog",
+          "text": "offline-planner: deterministic step for 'confirm real execution time via get_prefetch / g'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 7,
+          "tool": "get_eventlog",
+          "artifact_type": "eventlog",
+          "trust": 0.4,
+          "parse_ok": true,
+          "evidence_sha256": "37517e5f3dc6",
+          "text": "eventlog \u00b7 trust 0.4"
+        },
+        {
+          "kind": "correct",
+          "iteration": 7,
+          "rule": "R3",
+          "technique": "T1070.001 Indicator Removal: Clear Windows Event Logs",
+          "trusted": "SrumECmd",
+          "distrusted": "eventlog",
+          "pivot": "check $UsnJrnl for evtx deletion; correlate SRUM timeframe",
+          "text": "contradiction \u2014 believe SrumECmd, eventlog is forged"
+        },
+        {
+          "kind": "plan",
+          "iteration": 8,
+          "tool": "list_memory_netconns",
+          "text": "offline-planner: deterministic step for 'confirm real execution time via get_prefetch / g'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 8,
+          "tool": "list_memory_netconns",
+          "artifact_type": "memory_netconn",
+          "trust": 0.95,
+          "parse_ok": true,
+          "evidence_sha256": "1a6fc18db350",
+          "text": "memory_netconn \u00b7 trust 0.95"
+        }
+      ],
       "score": {
         "case": "case_blackcat",
         "expected": 3,
@@ -614,6 +774,120 @@
           "artifact_type": "eventlog",
           "trust": 0.4,
           "technique": null
+        }
+      ],
+      "replay": [
+        {
+          "kind": "plan",
+          "iteration": 1,
+          "tool": "get_mft_record",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 1,
+          "tool": "get_mft_record",
+          "artifact_type": "mft_fn_timestamp",
+          "trust": 0.9,
+          "parse_ok": true,
+          "evidence_sha256": "2269ce9cae67",
+          "text": "mft_fn_timestamp \u00b7 trust 0.9"
+        },
+        {
+          "kind": "plan",
+          "iteration": 2,
+          "tool": "list_memory_procs",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 2,
+          "tool": "list_memory_procs",
+          "artifact_type": "memory_proc",
+          "trust": 0.95,
+          "parse_ok": true,
+          "evidence_sha256": "7b167864477d",
+          "text": "memory_proc \u00b7 trust 0.95"
+        },
+        {
+          "kind": "plan",
+          "iteration": 3,
+          "tool": "get_amcache",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 3,
+          "tool": "get_amcache",
+          "artifact_type": "amcache",
+          "trust": 0.8,
+          "parse_ok": true,
+          "evidence_sha256": "0bc09dad35e1",
+          "text": "amcache \u00b7 trust 0.8"
+        },
+        {
+          "kind": "plan",
+          "iteration": 4,
+          "tool": "get_prefetch",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 4,
+          "tool": "get_prefetch",
+          "artifact_type": "prefetch",
+          "trust": 0.8,
+          "parse_ok": true,
+          "evidence_sha256": "c4a63ebd5c8b",
+          "text": "prefetch \u00b7 trust 0.8"
+        },
+        {
+          "kind": "plan",
+          "iteration": 5,
+          "tool": "get_usnjrnl",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 5,
+          "tool": "get_usnjrnl",
+          "artifact_type": "usnjrnl",
+          "trust": 0.85,
+          "parse_ok": true,
+          "evidence_sha256": "06c2d99f2f27",
+          "text": "usnjrnl \u00b7 trust 0.85"
+        },
+        {
+          "kind": "plan",
+          "iteration": 6,
+          "tool": "get_srum",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 6,
+          "tool": "get_srum",
+          "artifact_type": "srum",
+          "trust": 0.78,
+          "parse_ok": true,
+          "evidence_sha256": "b14505edeea9",
+          "text": "srum \u00b7 trust 0.78"
+        },
+        {
+          "kind": "plan",
+          "iteration": 7,
+          "tool": "get_eventlog",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 7,
+          "tool": "get_eventlog",
+          "artifact_type": "eventlog",
+          "trust": 0.4,
+          "parse_ok": true,
+          "evidence_sha256": "c08b3f97a174",
+          "text": "eventlog \u00b7 trust 0.4"
         }
       ],
       "score": {
@@ -928,6 +1202,140 @@
           "artifact_type": "eventlog",
           "trust": 0.4,
           "technique": null
+        }
+      ],
+      "replay": [
+        {
+          "kind": "plan",
+          "iteration": 1,
+          "tool": "get_mft_record",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 1,
+          "tool": "get_mft_record",
+          "artifact_type": "mft_fn_timestamp",
+          "trust": 0.9,
+          "parse_ok": true,
+          "evidence_sha256": "09139cb908bb",
+          "text": "mft_fn_timestamp \u00b7 trust 0.9"
+        },
+        {
+          "kind": "plan",
+          "iteration": 2,
+          "tool": "list_memory_procs",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 2,
+          "tool": "list_memory_procs",
+          "artifact_type": "memory_proc",
+          "trust": 0.95,
+          "parse_ok": true,
+          "evidence_sha256": "e4e4fb407a5d",
+          "text": "memory_proc \u00b7 trust 0.95"
+        },
+        {
+          "kind": "plan",
+          "iteration": 3,
+          "tool": "get_amcache",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 3,
+          "tool": "get_amcache",
+          "artifact_type": "amcache",
+          "trust": 0.8,
+          "parse_ok": true,
+          "evidence_sha256": "cb3efc90994a",
+          "text": "amcache \u00b7 trust 0.8"
+        },
+        {
+          "kind": "plan",
+          "iteration": 4,
+          "tool": "get_prefetch",
+          "text": "offline-planner: deterministic step for 'host shows execution of an unknown binary'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 4,
+          "tool": "get_prefetch",
+          "artifact_type": "prefetch",
+          "trust": 0.8,
+          "parse_ok": true,
+          "evidence_sha256": "37517e5f3dc6",
+          "text": "prefetch \u00b7 trust 0.8"
+        },
+        {
+          "kind": "correct",
+          "iteration": 4,
+          "rule": "R5",
+          "technique": "T1070.004 Indicator Removal: File Deletion (prefetch wiped)",
+          "trusted": "AmcacheParser",
+          "distrusted": "prefetch (absent)",
+          "pivot": "confirm via SRUM/ShimCache; check $UsnJrnl for prefetch deletes",
+          "text": "contradiction \u2014 believe AmcacheParser, prefetch (absent) is forged"
+        },
+        {
+          "kind": "plan",
+          "iteration": 5,
+          "tool": "get_usnjrnl",
+          "text": "offline-planner: deterministic step for 'confirm via SRUM/ShimCache; check $UsnJrnl for p'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 5,
+          "tool": "get_usnjrnl",
+          "artifact_type": "usnjrnl",
+          "trust": 0.85,
+          "parse_ok": true,
+          "evidence_sha256": "370e64dcabbc",
+          "text": "usnjrnl \u00b7 trust 0.85"
+        },
+        {
+          "kind": "correct",
+          "iteration": 5,
+          "rule": "R4",
+          "technique": "T1485 Data Destruction (anti-forensic wipe)",
+          "trusted": "MFTECmd.usn ($UsnJrnl)",
+          "distrusted": "filesystem (file absent)",
+          "pivot": "carve slack/unallocated for the deleted binary; check amcache for exec",
+          "text": "contradiction \u2014 believe MFTECmd.usn ($UsnJrnl), filesystem (file absent) is forged"
+        },
+        {
+          "kind": "plan",
+          "iteration": 6,
+          "tool": "get_srum",
+          "text": "offline-planner: deterministic step for 'confirm via SRUM/ShimCache; check $UsnJrnl for p'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 6,
+          "tool": "get_srum",
+          "artifact_type": "srum",
+          "trust": 0.78,
+          "parse_ok": true,
+          "evidence_sha256": "fca88ad46048",
+          "text": "srum \u00b7 trust 0.78"
+        },
+        {
+          "kind": "plan",
+          "iteration": 7,
+          "tool": "get_eventlog",
+          "text": "offline-planner: deterministic step for 'confirm via SRUM/ShimCache; check $UsnJrnl for p'"
+        },
+        {
+          "kind": "observe",
+          "iteration": 7,
+          "tool": "get_eventlog",
+          "artifact_type": "eventlog",
+          "trust": 0.4,
+          "parse_ok": true,
+          "evidence_sha256": "5aabec757ef2",
+          "text": "eventlog \u00b7 trust 0.4"
         }
       ],
       "score": {
