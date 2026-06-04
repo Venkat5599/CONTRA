@@ -2,16 +2,17 @@ import { useEffect, useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Lenis from "lenis";
 import type { Bundle } from "./types";
+import { ScrollProgress, AnimatedNumber, WordReveal, Magnetic } from "./motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-/* repeated stacked headline word (ART+TECH signature) */
-function Stack({ lines }: { lines: string[] }) {
+/* repeated stacked headline word (ART+TECH signature) — word-reveal animated */
+function Stack({ lines, light = false }: { lines: string[]; light?: boolean }) {
   return (
     <div className="leading-[0.86]">
       {lines.map((l, i) => (
-        <h2 key={i} className="font-display text-[12vw] font-semibold uppercase tracking-[-0.04em] text-graphite md:text-[7rem]">
-          {l}
+        <h2 key={i} className={`font-display text-[12vw] font-semibold uppercase tracking-[-0.04em] md:text-[7rem] ${light ? "text-paper" : "text-graphite"}`}>
+          <WordReveal text={l} delay={i * 0.08} />
         </h2>
       ))}
     </div>
@@ -48,12 +49,10 @@ function Chapter({ n, kicker, title, stat, body, quote }: {
             <Bracket>{kicker}</Bracket>
             <div className="mt-4">
               {title.map((t, i) => (
-                <motion.h3 key={i}
-                  initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.8, ease, delay: i * 0.06 }}
+                <h3 key={i}
                   className="font-display text-[8vw] font-semibold uppercase leading-[0.95] tracking-[-0.03em] text-graphite md:text-[3.4rem]">
-                  {t}
-                </motion.h3>
+                  <WordReveal text={t} delay={i * 0.08} />
+                </h3>
               ))}
             </div>
             <div className="mt-10 grid gap-8 md:grid-cols-[1.1fr_1fr]">
@@ -96,6 +95,7 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
   return (
     <div className="relative min-h-[100dvh] bg-paper text-graphite"
       style={{ fontFeatureSettings: '"ss03","ss04"' }}>
+      <ScrollProgress />
       {/* fixed top bar */}
       <header className="fixed inset-x-0 top-0 z-40 border-b border-graphite/15 bg-paper/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-3.5 md:px-8">
@@ -129,11 +129,11 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
                 an attacker leaves behind — encoding how a senior analyst actually thinks.
               </p>
               <div className="flex flex-col justify-end">
-                <button onClick={onLaunch}
-                  className="group flex w-max items-center gap-3 rounded-full bg-graphite py-3.5 pl-6 pr-3 font-display text-[15px] text-paper transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]">
+                <Magnetic onClick={onLaunch}
+                  className="group flex w-max items-center gap-3 rounded-full bg-graphite py-3.5 pl-6 pr-3 font-display text-[15px] text-paper">
                   Explore the report
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-paper/15 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1">↘</span>
-                </button>
+                </Magnetic>
               </div>
             </div>
           </Up>
@@ -147,15 +147,16 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
             <Bracket>the numbers</Bracket>
             <div className="mt-8 grid grid-cols-2 gap-y-10 md:grid-cols-4">
               {[
-                ["100%", "precision · recall"],
-                ["0", "false positives"],
-                [String(agg.findings), "anti-forensic findings"],
-                ["5", "contradiction rules"],
-              ].map(([v, l]) => (
-                <Up key={l}>
+                { v: 100, suffix: "%", l: "precision · recall" },
+                { v: 0, suffix: "", l: "false positives" },
+                { v: agg.findings, suffix: "", l: "anti-forensic findings" },
+                { v: 5, suffix: "", l: "contradiction rules" },
+              ].map((m) => (
+                <Up key={m.l}>
                   <div>
-                    <div className="font-display text-[14vw] font-semibold leading-none tracking-[-0.04em] text-graphite md:text-[5rem]">{v}</div>
-                    <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-stone">{l}</div>
+                    <AnimatedNumber value={m.v} suffix={m.suffix}
+                      className="block font-display text-[14vw] font-semibold leading-none tracking-[-0.04em] text-graphite md:text-[5rem]" />
+                    <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-stone">{m.l}</div>
                   </div>
                 </Up>
               ))}
@@ -216,7 +217,7 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
         <div className="mx-auto max-w-[1180px] px-5 py-24 md:px-8 md:py-32">
           <Bracket>methodology</Bracket>
           <div className="mt-8 grid gap-10 md:grid-cols-[1fr_1.2fr]">
-            <Stack lines={["How", "it runs"]} />
+            <Stack lines={["How", "it runs"]} light />
             <div className="space-y-5 font-display text-[15px] leading-relaxed text-paper/70">
               <p>CONTRA runs on the SANS SIFT Workstation as architecture pattern #2 — a custom
                 read-only tool surface. An LLM planner chooses the next forensic tool; a
@@ -225,11 +226,11 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
               <p>Validated on a real toolchain — volatility3 and the Eric Zimmerman tools on
                 Ubuntu / .NET 9 — against a real NTFS $MFT. Synthetic ground-truth cases score
                 the engine; real tool output proves it transfers.</p>
-              <button onClick={onLaunch}
-                className="group mt-4 flex w-max items-center gap-2 rounded-full bg-paper py-3 pl-6 pr-2.5 font-display text-[15px] text-graphite transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] active:scale-[0.98]">
+              <Magnetic onClick={onLaunch}
+                className="group mt-4 flex w-max items-center gap-2 rounded-full bg-paper py-3 pl-6 pr-2.5 font-display text-[15px] text-graphite">
                 Open the live console
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-graphite/10 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1">↗</span>
-              </button>
+              </Magnetic>
             </div>
           </div>
         </div>
