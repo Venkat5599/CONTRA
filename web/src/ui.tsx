@@ -50,26 +50,25 @@ export function Reveal({ children, delay = 0 }: { children: React.ReactNode; del
 export function StatTile({ label, value, accent, index = 0 }: {
   label: string; value: string; accent?: string; index?: number;
 }) {
-  const col = accent ?? "white";
+  const col = accent ?? "rgba(255,255,255,0.92)";
   const numeric = /^\d+$/.test(value);
   return (
-    <motion.div className="flex-1"
-      initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }} transition={{ duration: 0.7, ease: fluid, delay: index * 0.07 }}
-      whileHover={{ y: -4 }}>
-      <Bezel>
-        <div className="group relative overflow-hidden px-5 py-7">
-          {/* accent glow bloom */}
-          <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full opacity-20 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
-            style={{ background: col }} />
-          <div className="absolute right-4 top-4 font-mono text-[10px] text-white/20">0{index + 1}</div>
-          <div className="relative font-mono text-5xl font-semibold tabular-nums"
-            style={{ color: col, textShadow: accent ? `0 0 30px ${col}55` : "none" }}>
-            {numeric ? <CountUp to={parseInt(value, 10)} /> : value}
-          </div>
-          <div className="relative mt-2 text-[11px] uppercase tracking-[0.18em] text-white/45">{label}</div>
+    <motion.div className="group relative flex-1"
+      initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ duration: 0.7, ease: fluid, delay: index * 0.08 }}>
+      {/* hairline divider between tiles (editorial), not heavy boxes */}
+      {index > 0 && <span className="pointer-events-none absolute -left-5 top-2 hidden h-[78%] w-px bg-white/8 md:block" />}
+      <div className="relative px-1 py-3">
+        <div className="mb-5 flex items-center gap-2 font-mono text-[10px] text-white/25">
+          <span>0{index + 1}</span>
+          <span className="h-px w-6" style={{ background: accent ? col : "rgba(255,255,255,0.15)" }} />
         </div>
-      </Bezel>
+        <div className="font-display text-7xl font-semibold leading-none tabular-nums tracking-[-0.03em] md:text-8xl"
+          style={{ color: col, textShadow: accent ? `0 0 50px ${col}33` : "none" }}>
+          {numeric ? <CountUp to={parseInt(value, 10)} /> : value}
+        </div>
+        <div className="mt-4 font-mono text-[11px] uppercase tracking-[0.18em] text-white/40">{label}</div>
+      </div>
     </motion.div>
   );
 }

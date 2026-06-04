@@ -39,28 +39,28 @@ export default function Console({ bundle, onBack }: { bundle: Bundle; onBack: ()
         </div>
       </nav>
 
-      <main className="relative z-10 mx-auto max-w-[1180px] px-4 pb-32 pt-36 md:px-8">
+      <main className="relative z-10 mx-auto max-w-[1180px] px-5 pb-40 pt-40 md:px-8">
         {/* console title */}
         <Reveal>
-          <div className="mb-10 flex items-end justify-between border-b border-white/8 pb-6">
+          <div className="mb-16 flex items-end justify-between border-b border-white/8 pb-8">
             <div>
               <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/35">autonomous DFIR · evidence console</div>
-              <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">Find Evil.</h1>
+              <h1 className="mt-3 font-display text-5xl font-semibold tracking-tight text-white md:text-6xl">Find Evil.</h1>
             </div>
-            <div className="hidden text-right font-mono text-[11px] text-white/35 md:block">
+            <div className="hidden text-right font-mono text-[11px] leading-relaxed text-white/35 md:block">
               read-only MCP<br />trust-weighted engine
             </div>
           </div>
         </Reveal>
 
-        <div className="flex flex-col gap-3 md:flex-row">
+        <div className="grid grid-cols-2 gap-x-10 gap-y-12 md:flex md:gap-x-12">
           <StatTile index={0} label="cases triaged" value={String(agg.cases)} />
           <StatTile index={1} label="evil found" value={String(agg.findings)} accent="var(--color-evil)" />
           <StatTile index={2} label="false positives" value={String(agg.false_positives)} accent="var(--color-trust-high)" />
           <StatTile index={3} label="missed artifacts" value={String(agg.false_negatives)} accent="var(--color-trust-high)" />
         </div>
 
-        <div className="mt-12 flex flex-wrap items-center gap-2">
+        <div className="mt-20 flex flex-wrap items-center gap-2">
           <span className="mr-2 font-mono text-[11px] uppercase tracking-[0.18em] text-white/30">case</span>
           {bundle.cases.map((cc, i) => (
             <button key={cc.name} onClick={() => setActive(i)}
@@ -81,9 +81,9 @@ export default function Console({ bundle, onBack }: { bundle: Bundle; onBack: ()
         </div>
 
         <motion.div key={c.name} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: fluid }} className="mt-6">
+          transition={{ duration: 0.6, ease: fluid }} className="mt-10">
           <Bezel>
-            <div className="relative flex flex-wrap items-center justify-between gap-6 overflow-hidden px-7 py-7">
+            <div className="relative flex flex-wrap items-center justify-between gap-6 overflow-hidden px-8 py-9">
               {/* verdict-colored side glow */}
               <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5"
                 style={{ background: c.findings.length ? "var(--color-evil)" : "var(--color-trust-high)",
@@ -119,7 +119,7 @@ export default function Console({ bundle, onBack }: { bundle: Bundle; onBack: ()
         </motion.div>
 
         {/* Investigation Player — watch the agent reason + self-correct live */}
-        <div className="mt-6">
+        <div className="mt-16">
           <SectionLabel>▶ investigation replay · watch it catch the lie</SectionLabel>
           <Bezel><Player c={c} /></Bezel>
         </div>
