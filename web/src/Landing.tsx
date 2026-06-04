@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Lenis from "lenis";
 import type { Bundle } from "./types";
-import { ScrollProgress, AnimatedNumber, WordReveal, Magnetic } from "./motion";
+import { ScrollProgress, AnimatedNumber, WordReveal, Magnetic, DecodeText, Marquee, Cursor, Preloader } from "./motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -140,6 +140,8 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
   return (
     <div className="relative min-h-[100dvh] bg-paper text-graphite"
       style={{ fontFeatureSettings: '"ss03","ss04"' }}>
+      <Preloader />
+      <Cursor />
       <ScrollProgress />
       {/* fixed top bar */}
       <header className="fixed inset-x-0 top-0 z-40 border-b border-graphite/15 bg-paper/85 backdrop-blur-xl">
@@ -162,8 +164,12 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
         <div className="mx-auto max-w-[1180px]">
           <Up><Bracket>SANS · Find Evil · autonomous DFIR report</Bracket></Up>
           <Up delay={0.06}>
-            <div className="mt-8">
-              <Stack lines={["Assume", "the evidence", "is lying"]} />
+            <div className="mt-8 leading-[0.86]">
+              {["Assume", "the evidence", "is lying"].map((l, i) => (
+                <h2 key={i} className="font-display text-[12vw] font-semibold uppercase tracking-[-0.04em] text-graphite md:text-[7rem]">
+                  <DecodeText text={l} trigger="mount" duration={700 + i * 250} />
+                </h2>
+              ))}
             </div>
           </Up>
           <Up delay={0.14}>
@@ -209,6 +215,14 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
           </div>
         </section>
       )}
+
+      {/* MITRE technique marquee band */}
+      <div className="border-y border-graphite/15 bg-graphite py-4 text-paper">
+        <Marquee className="font-display text-[15px] uppercase tracking-[0.08em] text-paper/85"
+          items={["T1070.006 Timestomp", "T1055 Process Injection", "T1070.001 Clear Logs",
+                  "T1485 Data Destruction", "T1070.004 File Deletion", "read-only MCP",
+                  "evidence integrity", "self-correcting", "find evil"]} />
+      </div>
 
       {/* KEY FINDINGS header */}
       <section className="mx-auto max-w-[1180px] px-5 pt-24 md:px-8">

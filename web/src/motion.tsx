@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  motion, useReducedMotion, useScroll, useSpring, useTransform,
-  useInView, animate, type Variants,
+  motion, AnimatePresence, useReducedMotion, useScroll, useSpring, useTransform,
+  useInView, useVelocity, useMotionValue, animate, type Variants,
 } from "framer-motion";
 
 export const smooth = [0.22, 1, 0.36, 1] as const;
@@ -85,6 +85,165 @@ export function Magnetic({ children, className = "", onClick }: {
       whileTap={{ scale: 0.96 }} className={className}>
       {children}
     </motion.button>
+  );
+}
+
+/* ── Decode text — chars scramble from noise then resolve (forensic theme) ─ */
+const GLYPHS = "ABCDEF0123456789#%&$/\\<>";
+export function DecodeText({ text, className = "", trigger = "view", duration = 900 }: {
+  text: string; className?: string; trigger?: "view" | "mount"; duration?: number;
+}) {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+  const [out, setOut] = useState(reduce ? text : "");
+
+  useEffect(() => {
+    if (reduce) { setOut(text); return; }
+    const go = trigger === "mount" || inView;
+    if (!go) return;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const locked = Math.floor(p * text.length);
+      let s = "";
+      for (let i = 0; i < text.length; i++) {
+        s += i < locked || text[i] === " " ? text[i]
+          : GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      }
+      setOut(s);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [inView, reduce, text, trigger, duration]);
+
+  return <span ref={ref} className={className}>{out || " "}</span>;
+}
+
+/* ── Infinite marquee — scroll-velocity reactive ticker band ─────────── */
+export function Marquee({ items, baseSpeed = 0.4, className = "" }: {
+  items: string[]; baseSpeed?: number; className?: string;
+}) {
+  const reduce = useReducedMotion();
+  const x = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const vel = useVelocity(scrollY);
+  const smoothVel = useSpring(vel, { stiffness: 400, damping: 60 });
+  const factor = useTransform(smoothVel, [-1500, 0, 1500], [-3, 1, 3], { clamp: false });
+  const dir = useRef(1);
+
+  useEffect(() => {
+    if (reduce) return;
+    let raf = 0;
+    let last = performance.now();
+    const loop = (now: number) => {
+      const dt = now - last; last = now;
+      const f = factor.get();
+      dir.current = f < 0 ? -1 : 1;
+      let next = x.get() - baseSpeed * dt * 0.1 * Math.max(Math.abs(f), 0.4) * dir.current;
+      // wrap within one copy width (-50%)
+      if (next <= -50) next += 50;
+      if (next > 0) next -= 50;
+      x.set(next);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [reduce, baseSpeed, factor, x]);
+
+  const row = [...items, ...items];
+  return (
+    <div className={`overflow-hidden whitespace-nowrap ${className}`}>
+      <motion.div style={{ x: reduce ? 0 : useTransform(x, (v) => `${v}%`) }} className="inline-flex">
+        {[0, 1].map((c) => (
+          <span key={c} className="inline-flex shrink-0">
+            {row.map((it, i) => (
+              <span key={`${c}-${i}`} className="mx-6 inline-flex items-center gap-6">
+                <span>{it}</span><span className="text-accent">✦</span>
+              </span>
+            ))}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ── Custom crosshair cursor (forensic targeting) ────────────────────── */
+export function Cursor() {
+  const reduce = useReducedMotion();
+  const x = useMotionValue(-100);
+  const y = useMotionValue(-100);
+  const sx = useSpring(x, { stiffness: 500, damping: 40, mass: 0.3 });
+  const sy = useSpring(y, { stiffness: 500, damping: 40, mass: 0.3 });
+  const [hot, setHot] = useState(false);
+  const [touch, setTouch] = useState(true);
+
+  useEffect(() => {
+    if (reduce) return;
+    setTouch(window.matchMedia("(pointer: coarse)").matches);
+    const move = (e: MouseEvent) => {
+      x.set(e.clientX); y.set(e.clientY);
+      const el = e.target as HTMLElement;
+      setHot(!!el.closest("button, a, [data-cursor]"));
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, [reduce, x, y]);
+
+  if (reduce || touch) return null;
+  return (
+    <motion.div aria-hidden style={{ x: sx, y: sy }}
+      className="pointer-events-none fixed left-0 top-0 z-[60] -translate-x-1/2 -translate-y-1/2 mix-blend-difference">
+      <motion.div animate={{ scale: hot ? 2.4 : 1 }} transition={{ duration: 0.25, ease: smooth }}
+        className="relative flex h-5 w-5 items-center justify-center">
+        <span className="absolute h-5 w-px bg-white/80" />
+        <span className="absolute h-px w-5 bg-white/80" />
+        <span className="h-1 w-1 rounded-full bg-white" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ── Boot preloader — CONTRA initializes, then wipes away ────────────── */
+export function Preloader() {
+  const reduce = useReducedMotion();
+  const [done, setDone] = useState(reduce);
+  const [pct, setPct] = useState(0);
+
+  useEffect(() => {
+    if (reduce) return;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / 1400, 1);
+      setPct(Math.round(p * 100));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else setTimeout(() => setDone(true), 250);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [reduce]);
+
+  return (
+    <AnimatePresence mode="wait">
+      {!done && (
+        <motion.div key="pre" exit={{ y: "-100%" }} transition={{ duration: 0.8, ease: smooth }}
+          className="fixed inset-0 z-[80] flex flex-col items-center justify-center bg-graphite text-paper">
+          <DecodeText text="CONTRA" trigger="mount" duration={700}
+            className="font-display text-[12vw] font-semibold uppercase tracking-[-0.03em] md:text-[6rem]" />
+          <div className="mt-6 flex w-[200px] items-center gap-3 font-mono text-[11px] text-paper/50">
+            <div className="h-px flex-1 bg-paper/15">
+              <motion.div className="h-px bg-accent" style={{ width: `${pct}%` }} />
+            </div>
+            <span>{pct}%</span>
+          </div>
+          <span className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-paper/35">initializing read-only surface</span>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
