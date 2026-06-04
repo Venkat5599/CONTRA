@@ -1,0 +1,5 @@
+[
+  {"app": "evil.exe", "bytes_sent": 4823910, "bytes_recv": 210334,
+   "timestamp": "2026-06-01T22:42:00",
+   "notes": "large outbound transfer — exfil over the C2 socket"}
+]

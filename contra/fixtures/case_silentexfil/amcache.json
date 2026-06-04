@@ -1,0 +1,6 @@
+[
+  {"name": "stage.exe", "path": "C:\\Users\\Public\\stage.exe",
+   "sha1": "3da541559918a808c2402bba5012f6c60b27661c",
+   "last_modified": "2026-06-02T03:14:55", "executed": true,
+   "notes": "amcache proves stage.exe ran — execution evidence survives deletion"}
+]

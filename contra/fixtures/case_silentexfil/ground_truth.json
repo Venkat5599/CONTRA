@@ -1,0 +1,9 @@
+{
+  "case": "case_silentexfil",
+  "description": "Attacker staged + exfiltrated data, then wiped the binary and deleted prefetch. Execution evidence survives in amcache + $UsnJrnl.",
+  "expected_findings": [
+    {"rule_id": "R4", "technique_id": "T1485",     "artifact": "stage.exe"},
+    {"rule_id": "R5", "technique_id": "T1070.004", "artifact": "stage.exe"}
+  ],
+  "expected_false_positives": 0
+}

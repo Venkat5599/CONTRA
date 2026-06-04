@@ -1,0 +1,5 @@
+[
+  {"PID": 3344, "Owner": "evil.exe", "LocalAddr": "10.0.2.15:49210",
+   "ForeignAddr": "185.220.101.44:443", "State": "ESTABLISHED",
+   "notes": "C2 socket — evil.exe still beaconing"}
+]

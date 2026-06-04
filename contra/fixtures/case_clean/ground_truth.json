@@ -1,0 +1,6 @@
+{
+  "case": "case_clean",
+  "description": "Benign host. Consistent timestamps, process backed on disk, logs intact. No evil.",
+  "expected_findings": [],
+  "expected_false_positives": 0
+}

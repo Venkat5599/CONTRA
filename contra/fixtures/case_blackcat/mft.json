@@ -1,0 +1,15 @@
+{
+  "path": "C:\\Windows\\Temp\\evil.exe",
+  "si_timestamps": {
+    "created": "2019-03-12T08:14:02",
+    "modified": "2019-03-12T08:14:02",
+    "accessed": "2019-03-12T08:14:02"
+  },
+  "fn_timestamps": {
+    "created": "2026-06-01T22:41:09",
+    "modified": "2026-06-01T22:41:09",
+    "accessed": "2026-06-01T22:41:11"
+  },
+  "si_trust": 0.30,
+  "fn_trust": 0.90
+}

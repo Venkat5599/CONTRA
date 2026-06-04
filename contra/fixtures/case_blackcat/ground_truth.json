@@ -1,0 +1,10 @@
+{
+  "case": "case_blackcat",
+  "description": "Planted anti-forensic scenario: timestomp + fileless + cleared logs.",
+  "expected_findings": [
+    {"rule_id": "R1", "technique_id": "T1070.006", "artifact": "evil.exe"},
+    {"rule_id": "R2", "technique_id": "T1055",     "artifact": "evil.exe"},
+    {"rule_id": "R3", "technique_id": "T1070.001", "artifact": "eventlog"}
+  ],
+  "expected_false_positives": 0
+}

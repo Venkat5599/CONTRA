@@ -1,0 +1,5 @@
+[
+  {"app": "stage.exe", "bytes_sent": 91833442, "bytes_recv": 40221,
+   "timestamp": "2026-06-02T03:15:40",
+   "notes": "91 MB outbound before deletion — exfil staging"}
+]

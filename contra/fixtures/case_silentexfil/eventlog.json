@@ -1,0 +1,6 @@
+[
+  {"EventID": 4688, "channel": "Security", "time": "2026-06-02T03:14:55",
+   "msg": "A new process has been created: stage.exe"},
+  {"EventID": 4689, "channel": "Security", "time": "2026-06-02T03:15:50",
+   "msg": "A process has exited: stage.exe"}
+]

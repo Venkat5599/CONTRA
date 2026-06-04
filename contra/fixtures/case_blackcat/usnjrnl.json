@@ -1,0 +1,4 @@
+[
+  {"file": "evil.exe", "reasons": ["FILE_CREATE", "DATA_EXTEND", "CLOSE"],
+   "present_now": true, "notes": "created, still on disk — no wipe"}
+]

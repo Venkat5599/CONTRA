@@ -1,0 +1,7 @@
+[
+  {"PID": 4, "PPID": 0, "ImageFileName": "System", "backing_file_missing": false},
+  {"PID": 644, "PPID": 4, "ImageFileName": "smss.exe", "backing_file_missing": false},
+  {"PID": 1820, "PPID": 732, "ImageFileName": "svchost.exe", "backing_file_missing": false},
+  {"PID": 3344, "PPID": 1820, "ImageFileName": "evil.exe", "backing_file_missing": true,
+   "notes": "resident in memory, no backing file on disk — hollowed/fileless"}
+]

@@ -1,0 +1,7 @@
+[
+  {"file": "stage.exe", "reasons": ["FILE_CREATE", "DATA_EXTEND", "FILE_DELETE", "CLOSE"],
+   "present_now": false,
+   "notes": "created, written, then deleted — anti-forensic wipe after exfil"},
+  {"file": "report.docx", "reasons": ["DATA_OVERWRITE", "CLOSE"],
+   "present_now": true, "notes": "normal document edit"}
+]

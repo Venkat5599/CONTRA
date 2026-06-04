@@ -1,0 +1,4 @@
+[
+  {"file": "report.exe", "reasons": ["FILE_CREATE", "DATA_EXTEND", "CLOSE"],
+   "present_now": true, "notes": "normal install, still present"}
+]

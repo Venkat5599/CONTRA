@@ -1,0 +1,5 @@
+[
+  {"PID": 1820, "Owner": "svchost.exe", "LocalAddr": "10.0.2.15:50122",
+   "ForeignAddr": "20.190.160.14:443", "State": "ESTABLISHED",
+   "notes": "normal Microsoft telemetry endpoint"}
+]

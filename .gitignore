@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# CONTRA runtime output (regenerated; not source)
+logs/
+reports/
+docs/eval_results.json
+
+# Evidence must NEVER be committed (real case data is sensitive)
+evidence/
+*.raw
+*.E01
+*.dd
+*.vmem
+*.hve
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
