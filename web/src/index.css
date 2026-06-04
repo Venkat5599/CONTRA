@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz@1,8..60&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-serif: "Newsreader", serif;
+
+  --color-void: #050505;
+  --color-ink: #0a0b0d;
+  --color-haze: #16181d;
+
+  --color-trust-high: #34d399;   /* hard to forge */
+  --color-trust-mid: #fbbf24;
+  --color-trust-low: #fb7185;    /* trivially forged */
+  --color-evil: #f43f5e;
+}
+
+@layer base {
+  html { color-scheme: dark; }
+  body {
+    margin: 0;
+    background: var(--color-void);
+    color: rgba(255, 255, 255, 0.92);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+}
+
+/* fixed mesh-gradient field — the Ethereal Glass background */
+.mesh-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40rem 40rem at 12% 8%, rgba(244, 63, 94, 0.10), transparent 60%),
+    radial-gradient(46rem 46rem at 88% 18%, rgba(52, 211, 153, 0.08), transparent 60%),
+    radial-gradient(50rem 50rem at 50% 100%, rgba(99, 102, 241, 0.08), transparent 55%);
+}
+
+/* fixed film grain — pointer-events none, never on scroll containers */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.ease-fluid { transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }

@@ -23,3 +23,7 @@ evidence/
 Thumbs.db
 .vscode/
 .idea/
+
+web/node_modules/
+web/dist/
+web/.playwright-mcp/

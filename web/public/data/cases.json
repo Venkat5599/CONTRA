@@ -1,0 +1,958 @@
+{
+  "generated_by": "contra.export_web",
+  "thesis": "Assume the evidence is lying. Find evil in the contradictions between artifacts an attacker can forge and ones they cannot.",
+  "cases": [
+    {
+      "name": "case_blackcat",
+      "verdict": "MALICIOUS ACTIVITY CONFIRMED",
+      "iterations": 9,
+      "findings": [
+        {
+          "rule_id": "R1",
+          "technique": "T1070.006 Indicator Removal: Timestomp",
+          "severity": "HIGH",
+          "summary": "$SI created 2019-03-12T08:14:02 predates $FN created 2026-06-01T22:41:09 by 2638d \u2014 $SI timestamp was forged.",
+          "trusted_source": "MFTECmd:$FILE_NAME",
+          "distrusted_source": "MFTECmd:$STANDARD_INFORMATION",
+          "confidence": 0.6,
+          "pivot_hint": "confirm real execution time via get_prefetch / get_amcache",
+          "evidence_refs": [
+            "MFTECmd",
+            "-f",
+            "$MFT",
+            "--json",
+            "-"
+          ]
+        },
+        {
+          "rule_id": "R2",
+          "technique": "T1055 Process Injection / fileless execution",
+          "severity": "CRITICAL",
+          "summary": "process evil.exe resident in memory but no backing file on disk.",
+          "trusted_source": "volatility3.pslist",
+          "distrusted_source": "filesystem",
+          "confidence": 0.45,
+          "pivot_hint": "dump process with memory tools; check netscan for C2 socket",
+          "evidence_refs": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.pslist"
+          ]
+        },
+        {
+          "rule_id": "R3",
+          "technique": "T1070.001 Indicator Removal: Clear Windows Event Logs",
+          "severity": "HIGH",
+          "summary": "SRUM shows network/app activity but event log is empty \u2014 logs cleared.",
+          "trusted_source": "SrumECmd",
+          "distrusted_source": "eventlog",
+          "confidence": 0.38,
+          "pivot_hint": "check $UsnJrnl for evtx deletion; correlate SRUM timeframe",
+          "evidence_refs": [
+            "SrumECmd",
+            "-f",
+            "SRUDB.dat",
+            "--json",
+            "-"
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "artifact_type": "mft_fn_timestamp",
+          "source_tool": "MFTECmd",
+          "trust": 0.9,
+          "forge_cost": "high",
+          "raw_cmd": [
+            "MFTECmd",
+            "-f",
+            "$MFT",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "a55cc9c216436dc04991b16b73228e0a2b1ee55a2ff3956d9283db865613a6cc",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "memory_proc",
+          "source_tool": "volatility3.pslist",
+          "trust": 0.95,
+          "forge_cost": "very_high",
+          "raw_cmd": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.pslist"
+          ],
+          "evidence_sha256": "1a5b051ea6a7ab3072827c1e624ac1557106952501d879c82efa65fa9d4e2884",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "amcache",
+          "source_tool": "AmcacheParser",
+          "trust": 0.8,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "AmcacheParser",
+            "-f",
+            "Amcache.hve",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "e9fd4d95f019ce72180bd9026c2e8cbf73621b83de9a623b6cbbbbd1dba8aa10",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "prefetch",
+          "source_tool": "PECmd",
+          "trust": 0.8,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "PECmd",
+            "-d",
+            "Windows/Prefetch",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "b8a6c0e8d792ee4bc5e169d81b3e7a3f41e9f3480140290ed93ef97ce690c702",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "usnjrnl",
+          "source_tool": "MFTECmd.usn",
+          "trust": 0.85,
+          "forge_cost": "high",
+          "raw_cmd": [
+            "MFTECmd",
+            "-f",
+            "$J",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "9c0b724fb9229b89500f498968e18e1e2768c5c494515ad720a6d3ef82312957",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "srum",
+          "source_tool": "SrumECmd",
+          "trust": 0.78,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "SrumECmd",
+            "-f",
+            "SRUDB.dat",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "a285e5cebc8bb76c7c7311d560062e8f0b4ec4a511c4f9c4cb40d2cc8c371dbd",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "eventlog",
+          "source_tool": "evtx",
+          "trust": 0.4,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.evtxlog"
+          ],
+          "evidence_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "memory_netconn",
+          "source_tool": "volatility3.netscan",
+          "trust": 0.95,
+          "forge_cost": "very_high",
+          "raw_cmd": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.netscan"
+          ],
+          "evidence_sha256": "1a6fc18db350735c9ccc61cc4fea472b74a45f71f0ee1769427ed83f46157cf0",
+          "parse_ok": true
+        }
+      ],
+      "corrections": [
+        {
+          "iteration": 1,
+          "rule": "R1",
+          "technique": "T1070.006 Indicator Removal: Timestomp",
+          "trusted": "MFTECmd:$FILE_NAME",
+          "distrusted": "MFTECmd:$STANDARD_INFORMATION",
+          "pivot": "confirm real execution time via get_prefetch / get_amcache",
+          "confidence": 0.6000000000000001
+        },
+        {
+          "iteration": 2,
+          "rule": "R2",
+          "technique": "T1055 Process Injection / fileless execution",
+          "trusted": "volatility3.pslist",
+          "distrusted": "filesystem",
+          "pivot": "dump process with memory tools; check netscan for C2 socket",
+          "confidence": 0.44999999999999996
+        },
+        {
+          "iteration": 7,
+          "rule": "R3",
+          "technique": "T1070.001 Indicator Removal: Clear Windows Event Logs",
+          "trusted": "SrumECmd",
+          "distrusted": "eventlog",
+          "pivot": "check $UsnJrnl for evtx deletion; correlate SRUM timeframe",
+          "confidence": 0.38
+        }
+      ],
+      "timeline": [
+        {
+          "iteration": 1,
+          "event": "plan",
+          "tool": "get_mft_record",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 1,
+          "event": "observe",
+          "tool": "get_mft_record",
+          "artifact_type": "mft_fn_timestamp",
+          "trust": 0.9,
+          "technique": null
+        },
+        {
+          "iteration": 1,
+          "event": "CORRECT",
+          "tool": null,
+          "artifact_type": null,
+          "trust": null,
+          "technique": "T1070.006 Indicator Removal: Timestomp"
+        },
+        {
+          "iteration": 2,
+          "event": "plan",
+          "tool": "list_memory_procs",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 2,
+          "event": "observe",
+          "tool": "list_memory_procs",
+          "artifact_type": "memory_proc",
+          "trust": 0.95,
+          "technique": null
+        },
+        {
+          "iteration": 2,
+          "event": "CORRECT",
+          "tool": null,
+          "artifact_type": null,
+          "trust": null,
+          "technique": "T1055 Process Injection / fileless execution"
+        },
+        {
+          "iteration": 3,
+          "event": "plan",
+          "tool": "get_amcache",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 3,
+          "event": "observe",
+          "tool": "get_amcache",
+          "artifact_type": "amcache",
+          "trust": 0.8,
+          "technique": null
+        },
+        {
+          "iteration": 4,
+          "event": "plan",
+          "tool": "get_prefetch",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 4,
+          "event": "observe",
+          "tool": "get_prefetch",
+          "artifact_type": "prefetch",
+          "trust": 0.8,
+          "technique": null
+        },
+        {
+          "iteration": 5,
+          "event": "plan",
+          "tool": "get_usnjrnl",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 5,
+          "event": "observe",
+          "tool": "get_usnjrnl",
+          "artifact_type": "usnjrnl",
+          "trust": 0.85,
+          "technique": null
+        },
+        {
+          "iteration": 6,
+          "event": "plan",
+          "tool": "get_srum",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 6,
+          "event": "observe",
+          "tool": "get_srum",
+          "artifact_type": "srum",
+          "trust": 0.78,
+          "technique": null
+        },
+        {
+          "iteration": 7,
+          "event": "plan",
+          "tool": "get_eventlog",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 7,
+          "event": "observe",
+          "tool": "get_eventlog",
+          "artifact_type": "eventlog",
+          "trust": 0.4,
+          "technique": null
+        },
+        {
+          "iteration": 7,
+          "event": "CORRECT",
+          "tool": null,
+          "artifact_type": null,
+          "trust": null,
+          "technique": "T1070.001 Indicator Removal: Clear Windows Event Logs"
+        },
+        {
+          "iteration": 8,
+          "event": "plan",
+          "tool": "list_memory_netconns",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 8,
+          "event": "observe",
+          "tool": "list_memory_netconns",
+          "artifact_type": "memory_netconn",
+          "trust": 0.95,
+          "technique": null
+        }
+      ],
+      "score": {
+        "case": "case_blackcat",
+        "expected": 3,
+        "detected": 3,
+        "true_positives": 3,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "matched": [
+          "R1:T1070.006",
+          "R2:T1055",
+          "R3:T1070.001"
+        ],
+        "missed": [],
+        "spurious": []
+      },
+      "report_md": "# Incident Report \u2014 case_blackcat\n\n> Generated by CONTRA (Anti-Forensic Contradiction Engine). Autonomous triage; every finding is traced to the tool execution that produced it.\n\n## Executive summary\n\n- **Verdict:** MALICIOUS ACTIVITY CONFIRMED\n- **Findings:** 3 (1\u00d7 CRITICAL, 2\u00d7 HIGH)\n- **Artifacts examined:** 8\n- **Autonomous iterations:** 9\n- **Self-corrections (contradictions caught):** 3\n\n## Findings\n\n### 1. [R1 \u00b7 HIGH] T1070.006 Indicator Removal: Timestomp\n\n$SI created 2019-03-12T08:14:02 predates $FN created 2026-06-01T22:41:09 by 2638d \u2014 $SI timestamp was forged.\n\n- **Why believed:** trusted `MFTECmd:$FILE_NAME` over `MFTECmd:$STANDARD_INFORMATION` \u2014 the distrusted source is the cheaper to forge.\n- **Confidence (trust delta):** 0.60\n- **Analyst pivot taken:** confirm real execution time via get_prefetch / get_amcache\n- **Provenance:** `MFTECmd -f $MFT --json -`\n\n### 2. [R2 \u00b7 CRITICAL] T1055 Process Injection / fileless execution\n\nprocess evil.exe resident in memory but no backing file on disk.\n\n- **Why believed:** trusted `volatility3.pslist` over `filesystem` \u2014 the distrusted source is the cheaper to forge.\n- **Confidence (trust delta):** 0.45\n- **Analyst pivot taken:** dump process with memory tools; check netscan for C2 socket\n- **Provenance:** `vol -f memory.raw -r json windows.pslist`\n\n### 3. [R3 \u00b7 HIGH] T1070.001 Indicator Removal: Clear Windows Event Logs\n\nSRUM shows network/app activity but event log is empty \u2014 logs cleared.\n\n- **Why believed:** trusted `SrumECmd` over `eventlog` \u2014 the distrusted source is the cheaper to forge.\n- **Confidence (trust delta):** 0.38\n- **Analyst pivot taken:** check $UsnJrnl for evtx deletion; correlate SRUM timeframe\n- **Provenance:** `SrumECmd -f SRUDB.dat --json -`\n\n## Self-correction trace\n\nThe agent did not trust tool output at face value. Each entry below is a point where evidence contradicted itself and the agent re-weighted:\n\n- iter 1: **R1** T1070.006 Indicator Removal: Timestomp -- believed `MFTECmd:$FILE_NAME`, flagged `MFTECmd:$STANDARD_INFORMATION` as tampered -> pivoted: confirm real execution time via get_prefetch / get_amcache\n- iter 2: **R2** T1055 Process Injection / fileless execution -- believed `volatility3.pslist`, flagged `filesystem` as tampered -> pivoted: dump process with memory tools; check netscan for C2 socket\n- iter 7: **R3** T1070.001 Indicator Removal: Clear Windows Event Logs -- believed `SrumECmd`, flagged `eventlog` as tampered -> pivoted: check $UsnJrnl for evtx deletion; correlate SRUM timeframe\n\n## Evidence provenance\n\n| Artifact | Source tool | Trust | Command | Evidence SHA-256 |\n|----------|-------------|-------|---------|------------------|\n| mft_fn_timestamp | MFTECmd | 0.9 | `MFTECmd -f $MFT --json -` | `a55cc9c216436dc0\u2026` |\n| memory_proc | volatility3.pslist | 0.95 | `vol -f memory.raw -r json windows.pslist` | `1a5b051ea6a7ab30\u2026` |\n| amcache | AmcacheParser | 0.8 | `AmcacheParser -f Amcache.hve --json -` | `e9fd4d95f019ce72\u2026` |\n| prefetch | PECmd | 0.8 | `PECmd -d Windows/Prefetch --json -` | `b8a6c0e8d792ee4b\u2026` |\n| usnjrnl | MFTECmd.usn | 0.85 | `MFTECmd -f $J --json -` | `9c0b724fb9229b89\u2026` |\n| srum | SrumECmd | 0.78 | `SrumECmd -f SRUDB.dat --json -` | `a285e5cebc8bb76c\u2026` |\n| eventlog | evtx | 0.4 | `vol -f memory.raw -r json windows.evtxlog` | `37517e5f3dc66819\u2026` |\n| memory_netconn | volatility3.netscan | 0.95 | `vol -f memory.raw -r json windows.netscan` | `1a6fc18db350735c\u2026` |\n"
+    },
+    {
+      "name": "case_clean",
+      "verdict": "NO EVIL FOUND",
+      "iterations": 8,
+      "findings": [],
+      "artifacts": [
+        {
+          "artifact_type": "mft_fn_timestamp",
+          "source_tool": "MFTECmd",
+          "trust": 0.9,
+          "forge_cost": "high",
+          "raw_cmd": [
+            "MFTECmd",
+            "-f",
+            "$MFT",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "2269ce9cae67dd1e0b9c1e8fc5e31ddeb38cff0c1ef29386605705bc3061a486",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "memory_proc",
+          "source_tool": "volatility3.pslist",
+          "trust": 0.95,
+          "forge_cost": "very_high",
+          "raw_cmd": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.pslist"
+          ],
+          "evidence_sha256": "7b167864477d657456a6a11f7c186425327e517ab6db5eb25a1915c72d5da6db",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "amcache",
+          "source_tool": "AmcacheParser",
+          "trust": 0.8,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "AmcacheParser",
+            "-f",
+            "Amcache.hve",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "0bc09dad35e1ccf1231e2d7f138307db090dabd3db35bc922235bcaf933f9d34",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "prefetch",
+          "source_tool": "PECmd",
+          "trust": 0.8,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "PECmd",
+            "-d",
+            "Windows/Prefetch",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "c4a63ebd5c8bf2b5bf2c1c2ae0b82384397a96984fd89fc1598d53dcdbd3185e",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "usnjrnl",
+          "source_tool": "MFTECmd.usn",
+          "trust": 0.85,
+          "forge_cost": "high",
+          "raw_cmd": [
+            "MFTECmd",
+            "-f",
+            "$J",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "06c2d99f2f2722edc091c17adbe7eb830eb5f3fa1d8a64e8cb269c9a316ead5c",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "srum",
+          "source_tool": "SrumECmd",
+          "trust": 0.78,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "SrumECmd",
+            "-f",
+            "SRUDB.dat",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "b14505edeea9a1fc030c65ca645d6adf59ddfc6979e78442f54b8bfdf59ad19f",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "eventlog",
+          "source_tool": "evtx",
+          "trust": 0.4,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.evtxlog"
+          ],
+          "evidence_sha256": "c08b3f97a1740db6c3ba751a79f164beeedf577a7ceece231e3d1534f06df62e",
+          "parse_ok": true
+        }
+      ],
+      "corrections": [],
+      "timeline": [
+        {
+          "iteration": 1,
+          "event": "plan",
+          "tool": "get_mft_record",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 1,
+          "event": "observe",
+          "tool": "get_mft_record",
+          "artifact_type": "mft_fn_timestamp",
+          "trust": 0.9,
+          "technique": null
+        },
+        {
+          "iteration": 2,
+          "event": "plan",
+          "tool": "list_memory_procs",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 2,
+          "event": "observe",
+          "tool": "list_memory_procs",
+          "artifact_type": "memory_proc",
+          "trust": 0.95,
+          "technique": null
+        },
+        {
+          "iteration": 3,
+          "event": "plan",
+          "tool": "get_amcache",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 3,
+          "event": "observe",
+          "tool": "get_amcache",
+          "artifact_type": "amcache",
+          "trust": 0.8,
+          "technique": null
+        },
+        {
+          "iteration": 4,
+          "event": "plan",
+          "tool": "get_prefetch",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 4,
+          "event": "observe",
+          "tool": "get_prefetch",
+          "artifact_type": "prefetch",
+          "trust": 0.8,
+          "technique": null
+        },
+        {
+          "iteration": 5,
+          "event": "plan",
+          "tool": "get_usnjrnl",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 5,
+          "event": "observe",
+          "tool": "get_usnjrnl",
+          "artifact_type": "usnjrnl",
+          "trust": 0.85,
+          "technique": null
+        },
+        {
+          "iteration": 6,
+          "event": "plan",
+          "tool": "get_srum",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 6,
+          "event": "observe",
+          "tool": "get_srum",
+          "artifact_type": "srum",
+          "trust": 0.78,
+          "technique": null
+        },
+        {
+          "iteration": 7,
+          "event": "plan",
+          "tool": "get_eventlog",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 7,
+          "event": "observe",
+          "tool": "get_eventlog",
+          "artifact_type": "eventlog",
+          "trust": 0.4,
+          "technique": null
+        }
+      ],
+      "score": {
+        "case": "case_clean",
+        "expected": 0,
+        "detected": 0,
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "matched": [],
+        "missed": [],
+        "spurious": []
+      },
+      "report_md": "# Incident Report \u2014 case_clean\n\n> Generated by CONTRA (Anti-Forensic Contradiction Engine). Autonomous triage; every finding is traced to the tool execution that produced it.\n\n## Executive summary\n\n- **Verdict:** NO EVIL FOUND\n- **Findings:** 0 (none)\n- **Artifacts examined:** 7\n- **Autonomous iterations:** 8\n- **Self-corrections (contradictions caught):** 0\n\n## Findings\n\n## Self-correction trace\n\nNo contradictions detected \u2014 evidence was internally consistent.\n\n## Evidence provenance\n\n| Artifact | Source tool | Trust | Command | Evidence SHA-256 |\n|----------|-------------|-------|---------|------------------|\n| mft_fn_timestamp | MFTECmd | 0.9 | `MFTECmd -f $MFT --json -` | `2269ce9cae67dd1e\u2026` |\n| memory_proc | volatility3.pslist | 0.95 | `vol -f memory.raw -r json windows.pslist` | `7b167864477d6574\u2026` |\n| amcache | AmcacheParser | 0.8 | `AmcacheParser -f Amcache.hve --json -` | `0bc09dad35e1ccf1\u2026` |\n| prefetch | PECmd | 0.8 | `PECmd -d Windows/Prefetch --json -` | `c4a63ebd5c8bf2b5\u2026` |\n| usnjrnl | MFTECmd.usn | 0.85 | `MFTECmd -f $J --json -` | `06c2d99f2f2722ed\u2026` |\n| srum | SrumECmd | 0.78 | `SrumECmd -f SRUDB.dat --json -` | `b14505edeea9a1fc\u2026` |\n| eventlog | evtx | 0.4 | `vol -f memory.raw -r json windows.evtxlog` | `c08b3f97a1740db6\u2026` |\n"
+    },
+    {
+      "name": "case_silentexfil",
+      "verdict": "MALICIOUS ACTIVITY CONFIRMED",
+      "iterations": 8,
+      "findings": [
+        {
+          "rule_id": "R5",
+          "technique": "T1070.004 Indicator Removal: File Deletion (prefetch wiped)",
+          "severity": "HIGH",
+          "summary": "Amcache proves execution of stage.exe but no prefetch exists \u2014 prefetch artifacts were deleted to hide execution.",
+          "trusted_source": "AmcacheParser",
+          "distrusted_source": "prefetch (absent)",
+          "confidence": 0.6,
+          "pivot_hint": "confirm via SRUM/ShimCache; check $UsnJrnl for prefetch deletes",
+          "evidence_refs": [
+            "AmcacheParser",
+            "-f",
+            "Amcache.hve",
+            "--json",
+            "-"
+          ]
+        },
+        {
+          "rule_id": "R4",
+          "technique": "T1485 Data Destruction (anti-forensic wipe)",
+          "severity": "CRITICAL",
+          "summary": "$UsnJrnl records FILE_CREATE+FILE_DELETE for stage.exe and the file is absent now \u2014 deliberate wipe after use.",
+          "trusted_source": "MFTECmd.usn ($UsnJrnl)",
+          "distrusted_source": "filesystem (file absent)",
+          "confidence": 0.65,
+          "pivot_hint": "carve slack/unallocated for the deleted binary; check amcache for exec",
+          "evidence_refs": [
+            "MFTECmd",
+            "-f",
+            "$J",
+            "--json",
+            "-"
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "artifact_type": "mft_fn_timestamp",
+          "source_tool": "MFTECmd",
+          "trust": 0.9,
+          "forge_cost": "high",
+          "raw_cmd": [
+            "MFTECmd",
+            "-f",
+            "$MFT",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "09139cb908bb2fdffdfd2b59b535f924a21814138b9d0206908bbaeee8d8e69f",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "memory_proc",
+          "source_tool": "volatility3.pslist",
+          "trust": 0.95,
+          "forge_cost": "very_high",
+          "raw_cmd": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.pslist"
+          ],
+          "evidence_sha256": "e4e4fb407a5d75c306e1f4b3a7dddd2838a1dbcd15f07fbede005109421a9ec2",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "amcache",
+          "source_tool": "AmcacheParser",
+          "trust": 0.8,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "AmcacheParser",
+            "-f",
+            "Amcache.hve",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "cb3efc90994a69d3e640d134eeb31fa7b7efda19ce79f4589fe68590453ca353",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "prefetch",
+          "source_tool": "PECmd",
+          "trust": 0.8,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "PECmd",
+            "-d",
+            "Windows/Prefetch",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "usnjrnl",
+          "source_tool": "MFTECmd.usn",
+          "trust": 0.85,
+          "forge_cost": "high",
+          "raw_cmd": [
+            "MFTECmd",
+            "-f",
+            "$J",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "370e64dcabbc4fd8f230fac6c283c6417558aad6cc7ebbf115d4ca12de6c2dfe",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "srum",
+          "source_tool": "SrumECmd",
+          "trust": 0.78,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "SrumECmd",
+            "-f",
+            "SRUDB.dat",
+            "--json",
+            "-"
+          ],
+          "evidence_sha256": "fca88ad4604837e5189106f08a34dc06205ddef7cf85be335027749633b3e54f",
+          "parse_ok": true
+        },
+        {
+          "artifact_type": "eventlog",
+          "source_tool": "evtx",
+          "trust": 0.4,
+          "forge_cost": "medium",
+          "raw_cmd": [
+            "vol",
+            "-f",
+            "memory.raw",
+            "-r",
+            "json",
+            "windows.evtxlog"
+          ],
+          "evidence_sha256": "5aabec757ef2d4fe0152279c5038855ab5d385d4142313791b4a3b12075701e3",
+          "parse_ok": true
+        }
+      ],
+      "corrections": [
+        {
+          "iteration": 4,
+          "rule": "R5",
+          "technique": "T1070.004 Indicator Removal: File Deletion (prefetch wiped)",
+          "trusted": "AmcacheParser",
+          "distrusted": "prefetch (absent)",
+          "pivot": "confirm via SRUM/ShimCache; check $UsnJrnl for prefetch deletes",
+          "confidence": 0.6000000000000001
+        },
+        {
+          "iteration": 5,
+          "rule": "R4",
+          "technique": "T1485 Data Destruction (anti-forensic wipe)",
+          "trusted": "MFTECmd.usn ($UsnJrnl)",
+          "distrusted": "filesystem (file absent)",
+          "pivot": "carve slack/unallocated for the deleted binary; check amcache for exec",
+          "confidence": 0.6499999999999999
+        }
+      ],
+      "timeline": [
+        {
+          "iteration": 1,
+          "event": "plan",
+          "tool": "get_mft_record",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 1,
+          "event": "observe",
+          "tool": "get_mft_record",
+          "artifact_type": "mft_fn_timestamp",
+          "trust": 0.9,
+          "technique": null
+        },
+        {
+          "iteration": 2,
+          "event": "plan",
+          "tool": "list_memory_procs",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 2,
+          "event": "observe",
+          "tool": "list_memory_procs",
+          "artifact_type": "memory_proc",
+          "trust": 0.95,
+          "technique": null
+        },
+        {
+          "iteration": 3,
+          "event": "plan",
+          "tool": "get_amcache",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 3,
+          "event": "observe",
+          "tool": "get_amcache",
+          "artifact_type": "amcache",
+          "trust": 0.8,
+          "technique": null
+        },
+        {
+          "iteration": 4,
+          "event": "plan",
+          "tool": "get_prefetch",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 4,
+          "event": "observe",
+          "tool": "get_prefetch",
+          "artifact_type": "prefetch",
+          "trust": 0.8,
+          "technique": null
+        },
+        {
+          "iteration": 4,
+          "event": "CORRECT",
+          "tool": null,
+          "artifact_type": null,
+          "trust": null,
+          "technique": "T1070.004 Indicator Removal: File Deletion (prefetch wiped)"
+        },
+        {
+          "iteration": 5,
+          "event": "plan",
+          "tool": "get_usnjrnl",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 5,
+          "event": "observe",
+          "tool": "get_usnjrnl",
+          "artifact_type": "usnjrnl",
+          "trust": 0.85,
+          "technique": null
+        },
+        {
+          "iteration": 5,
+          "event": "CORRECT",
+          "tool": null,
+          "artifact_type": null,
+          "trust": null,
+          "technique": "T1485 Data Destruction (anti-forensic wipe)"
+        },
+        {
+          "iteration": 6,
+          "event": "plan",
+          "tool": "get_srum",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 6,
+          "event": "observe",
+          "tool": "get_srum",
+          "artifact_type": "srum",
+          "trust": 0.78,
+          "technique": null
+        },
+        {
+          "iteration": 7,
+          "event": "plan",
+          "tool": "get_eventlog",
+          "artifact_type": null,
+          "trust": null,
+          "technique": null
+        },
+        {
+          "iteration": 7,
+          "event": "observe",
+          "tool": "get_eventlog",
+          "artifact_type": "eventlog",
+          "trust": 0.4,
+          "technique": null
+        }
+      ],
+      "score": {
+        "case": "case_silentexfil",
+        "expected": 2,
+        "detected": 2,
+        "true_positives": 2,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "matched": [
+          "R4:T1485",
+          "R5:T1070.004"
+        ],
+        "missed": [],
+        "spurious": []
+      },
+      "report_md": "# Incident Report \u2014 case_silentexfil\n\n> Generated by CONTRA (Anti-Forensic Contradiction Engine). Autonomous triage; every finding is traced to the tool execution that produced it.\n\n## Executive summary\n\n- **Verdict:** MALICIOUS ACTIVITY CONFIRMED\n- **Findings:** 2 (1\u00d7 CRITICAL, 1\u00d7 HIGH)\n- **Artifacts examined:** 7\n- **Autonomous iterations:** 8\n- **Self-corrections (contradictions caught):** 2\n\n## Findings\n\n### 1. [R5 \u00b7 HIGH] T1070.004 Indicator Removal: File Deletion (prefetch wiped)\n\nAmcache proves execution of stage.exe but no prefetch exists \u2014 prefetch artifacts were deleted to hide execution.\n\n- **Why believed:** trusted `AmcacheParser` over `prefetch (absent)` \u2014 the distrusted source is the cheaper to forge.\n- **Confidence (trust delta):** 0.60\n- **Analyst pivot taken:** confirm via SRUM/ShimCache; check $UsnJrnl for prefetch deletes\n- **Provenance:** `AmcacheParser -f Amcache.hve --json -`\n\n### 2. [R4 \u00b7 CRITICAL] T1485 Data Destruction (anti-forensic wipe)\n\n$UsnJrnl records FILE_CREATE+FILE_DELETE for stage.exe and the file is absent now \u2014 deliberate wipe after use.\n\n- **Why believed:** trusted `MFTECmd.usn ($UsnJrnl)` over `filesystem (file absent)` \u2014 the distrusted source is the cheaper to forge.\n- **Confidence (trust delta):** 0.65\n- **Analyst pivot taken:** carve slack/unallocated for the deleted binary; check amcache for exec\n- **Provenance:** `MFTECmd -f $J --json -`\n\n## Self-correction trace\n\nThe agent did not trust tool output at face value. Each entry below is a point where evidence contradicted itself and the agent re-weighted:\n\n- iter 4: **R5** T1070.004 Indicator Removal: File Deletion (prefetch wiped) -- believed `AmcacheParser`, flagged `prefetch (absent)` as tampered -> pivoted: confirm via SRUM/ShimCache; check $UsnJrnl for prefetch deletes\n- iter 5: **R4** T1485 Data Destruction (anti-forensic wipe) -- believed `MFTECmd.usn ($UsnJrnl)`, flagged `filesystem (file absent)` as tampered -> pivoted: carve slack/unallocated for the deleted binary; check amcache for exec\n\n## Evidence provenance\n\n| Artifact | Source tool | Trust | Command | Evidence SHA-256 |\n|----------|-------------|-------|---------|------------------|\n| mft_fn_timestamp | MFTECmd | 0.9 | `MFTECmd -f $MFT --json -` | `09139cb908bb2fdf\u2026` |\n| memory_proc | volatility3.pslist | 0.95 | `vol -f memory.raw -r json windows.pslist` | `e4e4fb407a5d75c3\u2026` |\n| amcache | AmcacheParser | 0.8 | `AmcacheParser -f Amcache.hve --json -` | `cb3efc90994a69d3\u2026` |\n| prefetch | PECmd | 0.8 | `PECmd -d Windows/Prefetch --json -` | `37517e5f3dc66819\u2026` |\n| usnjrnl | MFTECmd.usn | 0.85 | `MFTECmd -f $J --json -` | `370e64dcabbc4fd8\u2026` |\n| srum | SrumECmd | 0.78 | `SrumECmd -f SRUDB.dat --json -` | `fca88ad4604837e5\u2026` |\n| eventlog | evtx | 0.4 | `vol -f memory.raw -r json windows.evtxlog` | `5aabec757ef2d4fe\u2026` |\n"
+    }
+  ],
+  "aggregate": {
+    "cases": 3,
+    "findings": 5,
+    "false_positives": 0,
+    "false_negatives": 0
+  }
+}
