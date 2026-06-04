@@ -23,6 +23,25 @@ function Bracket({ children }: { children: React.ReactNode }) {
   return <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-stone">[ {children} ]</span>;
 }
 
+function CopyRow({ cmd, prompt = false }: { cmd: string; prompt?: boolean }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(cmd).then(() => {
+      setCopied(true); setTimeout(() => setCopied(false), 1400);
+    });
+  };
+  return (
+    <button onClick={copy}
+      className="group flex w-full items-center gap-3 rounded-xl border border-paper/12 bg-paper/[0.04] px-4 py-3 text-left transition-colors hover:bg-paper/[0.07]">
+      <span className="shrink-0 font-mono text-[13px] text-accent">{prompt ? "›" : "$"}</span>
+      <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-[13px] text-paper/85">{cmd}</code>
+      <span className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-paper/40 transition-colors group-hover:text-paper/70">
+        {copied ? "copied" : "copy"}
+      </span>
+    </button>
+  );
+}
+
 function Up({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }}
@@ -222,6 +241,63 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
                   "T1485 Data Destruction", "T1070.004 File Deletion", "read-only MCP",
                   "evidence integrity", "self-correcting", "find evil"]} />
       </div>
+
+      {/* TRY IT — install + demo, dark band */}
+      <section id="try" className="border-y border-graphite/15 bg-graphite text-paper">
+        <div className="mx-auto max-w-[1180px] px-5 py-24 md:px-8 md:py-32">
+          <Up>
+            <span className="font-mono text-[12px] uppercase tracking-[0.2em] text-accent">try it · 2 minutes</span>
+            <h2 className="mt-4 max-w-3xl font-display text-[40px] font-semibold leading-tight tracking-tight md:text-[56px]">
+              Install the MCP. Ask Claude to find evil.
+            </h2>
+            <p className="mt-5 max-w-2xl font-display text-[17px] text-paper/55">
+              CONTRA ships as a real read-only MCP server. Two commands register it in Claude
+              Desktop — no JSON editing, no disk image, no VPS. Three forensic sample cases are bundled.
+            </p>
+          </Up>
+
+          <div className="mt-14 grid gap-10 md:grid-cols-2">
+            {/* install */}
+            <Up>
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 font-mono text-[12px] text-accent">1</span>
+                <span className="font-display text-[16px] text-paper/90">Install &amp; register</span>
+              </div>
+              <div className="mt-5 space-y-2.5">
+                <CopyRow cmd='pip install "git+https://github.com/Venkat5599/CONTRA.git"' />
+                <CopyRow cmd="contra-setup" />
+              </div>
+              <p className="mt-4 font-mono text-[12px] text-paper/40">
+                then fully quit &amp; reopen Claude Desktop · <span className="text-paper/60">contra</span> appears in connectors
+              </p>
+            </Up>
+
+            {/* run */}
+            <Up delay={0.1}>
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/20 font-mono text-[12px] text-accent">2</span>
+                <span className="font-display text-[16px] text-paper/90">Ask your agent</span>
+              </div>
+              <div className="mt-5 space-y-2.5">
+                <CopyRow prompt cmd="List the contra cases, then triage case_blackcat and explain the evil." />
+                <CopyRow prompt cmd="Now triage case_clean." />
+              </div>
+              <p className="mt-4 font-mono text-[12px] text-paper/40">
+                expect <span className="text-evil">MALICIOUS ACTIVITY CONFIRMED</span> · R1 timestomp · R2 fileless · R3 cleared logs
+              </p>
+            </Up>
+          </div>
+
+          {/* alt paths */}
+          <Up delay={0.15}>
+            <div className="mt-14 flex flex-wrap gap-x-10 gap-y-3 border-t border-paper/10 pt-8 font-mono text-[12px] text-paper/45">
+              <span><span className="text-paper/70">hand the repo to Claude:</span> "set up CONTRA and find evil" — it installs itself</span>
+              <span><span className="text-paper/70">Claude Code:</span> claude mcp add contra contra-mcp</span>
+              <span><span className="text-paper/70">engine only:</span> python -m contra.demo_offline</span>
+            </div>
+          </Up>
+        </div>
+      </section>
 
       {/* KEY FINDINGS header */}
       <section className="mx-auto max-w-[1180px] px-5 pt-24 md:px-8">
