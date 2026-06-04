@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Lenis from "lenis";
 import type { Bundle } from "./types";
-import { ScrollProgress, AnimatedNumber, WordReveal, Magnetic, DecodeText, Marquee, Cursor, Preloader } from "./motion";
+import { ScrollProgress, AnimatedNumber, WordReveal, Magnetic, DecodeText, Marquee, Preloader } from "./motion";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -141,7 +141,6 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
     <div className="relative min-h-[100dvh] bg-paper text-graphite"
       style={{ fontFeatureSettings: '"ss03","ss04"' }}>
       <Preloader />
-      <Cursor />
       <ScrollProgress />
       {/* fixed top bar */}
       <header className="fixed inset-x-0 top-0 z-40 border-b border-graphite/15 bg-paper/85 backdrop-blur-xl">
