@@ -123,35 +123,32 @@ export function DecodeText({ text, className = "", trigger = "view", duration = 
 }
 
 /* ── Infinite marquee — scroll-velocity reactive ticker band ─────────── */
-export function Marquee({ items, baseSpeed = 0.4, className = "" }: {
+export function Marquee({ items, baseSpeed = 0.0016, className = "" }: {
   items: string[]; baseSpeed?: number; className?: string;
 }) {
   const reduce = useReducedMotion();
   const x = useMotionValue(0);
   const { scrollY } = useScroll();
   const vel = useVelocity(scrollY);
-  const smoothVel = useSpring(vel, { stiffness: 400, damping: 60 });
-  const factor = useTransform(smoothVel, [-1500, 0, 1500], [-3, 1, 3], { clamp: false });
-  const dir = useRef(1);
+  const smoothVel = useSpring(vel, { stiffness: 300, damping: 80 });
+  // idle boost = 1; fast scroll adds up to ~2.5x, capped; never reverses jarringly
+  const boost = useTransform(smoothVel, [-2000, 0, 2000], [2.5, 1, 2.5], { clamp: true });
 
   useEffect(() => {
     if (reduce) return;
     let raf = 0;
     let last = performance.now();
     const loop = (now: number) => {
-      const dt = now - last; last = now;
-      const f = factor.get();
-      dir.current = f < 0 ? -1 : 1;
-      let next = x.get() - baseSpeed * dt * 0.1 * Math.max(Math.abs(f), 0.4) * dir.current;
-      // wrap within one copy width (-50%)
-      if (next <= -50) next += 50;
-      if (next > 0) next -= 50;
+      const dt = Math.min(now - last, 50); last = now;  // clamp dt to avoid jumps
+      const next0 = x.get() - baseSpeed * dt * boost.get();
+      let next = next0;
+      if (next <= -50) next += 50;   // wrap within one copy width
       x.set(next);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [reduce, baseSpeed, factor, x]);
+  }, [reduce, baseSpeed, boost, x]);
 
   const row = [...items, ...items];
   return (
