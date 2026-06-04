@@ -23,37 +23,59 @@ export default function Console({ bundle, onBack }: { bundle: Bundle; onBack: ()
   return (
     <div className="relative min-h-[100dvh] bg-void text-white/90">
       <div className="mesh-field" />
+      <div className="grid-field" />
       <div className="grain" />
 
       <nav className="fixed inset-x-0 top-0 z-40 flex justify-center">
-        <div className="mx-auto mt-6 flex w-max items-center gap-4 rounded-full border border-white/10 bg-black/50 px-5 py-2.5 backdrop-blur-2xl">
-          <button onClick={onBack} className="font-mono text-[12px] text-white/55 transition-colors hover:text-white">← back</button>
+        <div className="mx-auto mt-6 flex w-max items-center gap-4 rounded-full border border-white/10 bg-black/60 px-5 py-2.5 backdrop-blur-2xl">
+          <button onClick={onBack} className="group flex items-center gap-1.5 font-mono text-[12px] text-white/55 transition-colors hover:text-white">
+            <span className="transition-transform duration-300 group-hover:-translate-x-0.5">←</span> back
+          </button>
           <span className="h-3 w-px bg-white/15" />
           <span className="font-display text-[15px] font-bold tracking-tight text-white">CONTRA</span>
-          <span className="font-mono text-[11px] text-white/45">console</span>
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-white/45">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-trust-high" /> live console
+          </span>
         </div>
       </nav>
 
-      <main className="relative z-10 mx-auto max-w-[1180px] px-4 pb-32 pt-32 md:px-8">
-        <Reveal delay={0.05}>
-          <div className="flex flex-col gap-3 md:flex-row">
-            <StatTile label="cases triaged" value={String(agg.cases)} />
-            <StatTile label="evil found" value={String(agg.findings)} accent="var(--color-evil)" />
-            <StatTile label="false positives" value={String(agg.false_positives)} accent="var(--color-trust-high)" />
-            <StatTile label="missed artifacts" value={String(agg.false_negatives)} accent="var(--color-trust-high)" />
+      <main className="relative z-10 mx-auto max-w-[1180px] px-4 pb-32 pt-36 md:px-8">
+        {/* console title */}
+        <Reveal>
+          <div className="mb-10 flex items-end justify-between border-b border-white/8 pb-6">
+            <div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-white/35">autonomous DFIR · evidence console</div>
+              <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-white md:text-5xl">Find Evil.</h1>
+            </div>
+            <div className="hidden text-right font-mono text-[11px] text-white/35 md:block">
+              read-only MCP<br />trust-weighted engine
+            </div>
           </div>
         </Reveal>
 
-        <div className="mt-12 flex flex-wrap gap-2">
+        <div className="flex flex-col gap-3 md:flex-row">
+          <StatTile index={0} label="cases triaged" value={String(agg.cases)} />
+          <StatTile index={1} label="evil found" value={String(agg.findings)} accent="var(--color-evil)" />
+          <StatTile index={2} label="false positives" value={String(agg.false_positives)} accent="var(--color-trust-high)" />
+          <StatTile index={3} label="missed artifacts" value={String(agg.false_negatives)} accent="var(--color-trust-high)" />
+        </div>
+
+        <div className="mt-12 flex flex-wrap items-center gap-2">
+          <span className="mr-2 font-mono text-[11px] uppercase tracking-[0.18em] text-white/30">case</span>
           {bundle.cases.map((cc, i) => (
             <button key={cc.name} onClick={() => setActive(i)}
-              className="group rounded-full border px-4 py-2 font-mono text-[12px] transition-all duration-500 ease-fluid"
+              className="group relative rounded-full border px-4 py-2 font-mono text-[12px] transition-all duration-500 ease-fluid hover:scale-[1.03]"
               style={{
-                borderColor: i === active ? "rgba(244,63,94,0.4)" : "rgba(255,255,255,0.1)",
-                background: i === active ? "rgba(244,63,94,0.1)" : "rgba(255,255,255,0.02)",
-                color: i === active ? "#fb7185" : "rgba(255,255,255,0.5)",
+                borderColor: i === active ? "rgba(244,63,94,0.45)" : "rgba(255,255,255,0.1)",
+                background: i === active ? "rgba(244,63,94,0.12)" : "rgba(255,255,255,0.02)",
+                color: i === active ? "#fb7185" : "rgba(255,255,255,0.55)",
+                boxShadow: i === active ? "0 0 24px rgba(244,63,94,0.25)" : "none",
               }}>
-              {cc.name}<span className="ml-2 text-white/30">{cc.findings.length}</span>
+              {cc.name}
+              <span className="ml-2 rounded-full px-1.5 py-0.5 text-[10px]"
+                style={{ background: i === active ? "rgba(244,63,94,0.2)" : "rgba(255,255,255,0.06)", color: i === active ? "#fb7185" : "rgba(255,255,255,0.4)" }}>
+                {cc.findings.length}
+              </span>
             </button>
           ))}
         </div>
@@ -61,17 +83,36 @@ export default function Console({ bundle, onBack }: { bundle: Bundle; onBack: ()
         <motion.div key={c.name} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: fluid }} className="mt-6">
           <Bezel>
-            <div className="flex flex-wrap items-center justify-between gap-4 px-7 py-6">
-              <div>
-                <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/40">verdict</div>
-                <div className="mt-1 font-display text-2xl font-semibold"
-                  style={{ color: c.findings.length ? "var(--color-evil)" : "var(--color-trust-high)" }}>{c.verdict}</div>
+            <div className="relative flex flex-wrap items-center justify-between gap-6 overflow-hidden px-7 py-7">
+              {/* verdict-colored side glow */}
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5"
+                style={{ background: c.findings.length ? "var(--color-evil)" : "var(--color-trust-high)",
+                         boxShadow: `0 0 30px ${c.findings.length ? "var(--color-evil)" : "var(--color-trust-high)"}` }} />
+              <div className="pl-3">
+                <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-white/40">
+                  <motion.span className="h-1.5 w-1.5 rounded-full"
+                    style={{ background: c.findings.length ? "var(--color-evil)" : "var(--color-trust-high)" }}
+                    animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.6, repeat: Infinity }} />
+                  verdict
+                </div>
+                <div className="mt-2 font-display text-2xl font-semibold md:text-3xl"
+                  style={{ color: c.findings.length ? "var(--color-evil)" : "var(--color-trust-high)",
+                           textShadow: `0 0 40px ${c.findings.length ? "rgba(244,63,94,0.4)" : "rgba(52,211,153,0.4)"}` }}>
+                  {c.verdict}
+                </div>
               </div>
-              <div className="flex gap-8 font-mono text-[13px]">
-                <div><div className="text-white/40">iterations</div><div className="text-white/80">{c.iterations}</div></div>
-                <div><div className="text-white/40">self-corrections</div><div className="text-white/80">{c.corrections.length}</div></div>
-                <div><div className="text-white/40">precision</div><div className="text-trust-high">{precision.toFixed(2)}</div></div>
-                <div><div className="text-white/40">recall</div><div className="text-trust-high">{c.score.recall.toFixed(2)}</div></div>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-3 font-mono text-[13px] md:flex md:gap-9">
+                {[
+                  ["iterations", String(c.iterations), "text-white/85"],
+                  ["self-corrections", String(c.corrections.length), "text-evil"],
+                  ["precision", precision.toFixed(2), "text-trust-high"],
+                  ["recall", c.score.recall.toFixed(2), "text-trust-high"],
+                ].map(([l, v, col]) => (
+                  <div key={l}>
+                    <div className="text-[10px] uppercase tracking-wider text-white/35">{l}</div>
+                    <div className={`mt-0.5 text-lg ${col}`}>{v}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </Bezel>

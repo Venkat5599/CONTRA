@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, animate } from "framer-motion";
 import type { Artifact, Case, Correction, Finding } from "./types";
 
 export const fluid = [0.32, 0.72, 0, 1] as const;
@@ -46,15 +47,43 @@ export function Reveal({ children, delay = 0 }: { children: React.ReactNode; del
   );
 }
 
-export function StatTile({ label, value, accent }: { label: string; value: string; accent?: string }) {
+export function StatTile({ label, value, accent, index = 0 }: {
+  label: string; value: string; accent?: string; index?: number;
+}) {
+  const col = accent ?? "white";
+  const numeric = /^\d+$/.test(value);
   return (
-    <Bezel className="flex-1">
-      <div className="px-5 py-6">
-        <div className="font-mono text-4xl font-semibold" style={{ color: accent ?? "white" }}>{value}</div>
-        <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-white/45">{label}</div>
-      </div>
-    </Bezel>
+    <motion.div className="flex-1"
+      initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ duration: 0.7, ease: fluid, delay: index * 0.07 }}
+      whileHover={{ y: -4 }}>
+      <Bezel>
+        <div className="group relative overflow-hidden px-5 py-7">
+          {/* accent glow bloom */}
+          <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full opacity-20 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
+            style={{ background: col }} />
+          <div className="absolute right-4 top-4 font-mono text-[10px] text-white/20">0{index + 1}</div>
+          <div className="relative font-mono text-5xl font-semibold tabular-nums"
+            style={{ color: col, textShadow: accent ? `0 0 30px ${col}55` : "none" }}>
+            {numeric ? <CountUp to={parseInt(value, 10)} /> : value}
+          </div>
+          <div className="relative mt-2 text-[11px] uppercase tracking-[0.18em] text-white/45">{label}</div>
+        </div>
+      </Bezel>
+    </motion.div>
   );
+}
+
+function CountUp({ to }: { to: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!inView) return;
+    const c = animate(0, to, { duration: 1, ease: fluid, onUpdate: (v) => setN(Math.round(v)) });
+    return () => c.stop();
+  }, [inView, to]);
+  return <span ref={ref}>{n}</span>;
 }
 
 /* ── Finding card ───────────────────────────────────────────────────── */

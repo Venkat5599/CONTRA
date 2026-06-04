@@ -64,3 +64,16 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 .ease-fluid { transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* faint blueprint grid for the dark console */
+.grid-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 75%);
+}
