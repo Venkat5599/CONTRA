@@ -14,6 +14,14 @@
   --color-trust-mid: #fbbf24;
   --color-trust-low: #fb7185;    /* trivially forged */
   --color-evil: #f43f5e;
+
+  /* light editorial palette (GIC-style landing) */
+  --color-paper: #f6f5f1;
+  --color-paper-2: #efede7;
+  --color-graphite: #14151a;
+  --color-stone: #6b6a65;
+  --color-line: #e2e0d8;
+  --color-accent: #d6452e;       /* warm forensic red-clay */
 }
 
 @layer base {
