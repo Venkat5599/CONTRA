@@ -8,6 +8,28 @@
 
 **Live console:** https://contra-dfir.vercel.app · **Repo:** https://github.com/Venkat5599/CONTRA
 
+## Try it in 30 seconds
+
+CONTRA is a real MCP server. Three ways to run it — pick one:
+
+**A. Hand the repo to Claude.** Open this repo in Claude Code (or paste the repo to any
+Claude with tools) and say *"set up CONTRA and triage the sample case."* It reads
+`CLAUDE.md` and installs + runs itself.
+
+**B. Two commands (Claude Desktop):**
+```bash
+pip install "git+https://github.com/Venkat5599/CONTRA.git"
+contra-setup        # auto-registers in Claude Desktop, no JSON editing
+```
+Restart Desktop, then ask: *"List the cases, then triage case_blackcat and explain the evil."*
+
+**C. No client, just the engine:**
+```bash
+pip install -e .  &&  python -m contra.demo_offline      # finds R1/R2/R3 on a sample case
+```
+
+No disk image, no VPS, no config — three forensic sample cases are committed.
+
 ---
 
 ## The one-sentence thesis
