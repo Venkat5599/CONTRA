@@ -42,6 +42,7 @@ class LLMClient:
     def __init__(self, model: str | None = None, base_url: str | None = None):
         self.base_url = (base_url or os.environ.get("CONTRA_LLM_BASE_URL")
                          or "https://opencode.ai/zen/v1").rstrip("/")
+        # deepseek-v4-flash-free: reliable tool-sequencing on the OpenCode free tier.
         self.model = model or os.environ.get("CONTRA_LLM_MODEL") or "deepseek-v4-flash-free"
         self.ua = os.environ.get("CONTRA_LLM_UA") or "opencode/1.15.12"
         self.key = _load_key()

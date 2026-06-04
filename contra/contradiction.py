@@ -50,25 +50,45 @@ def rule_timestomp(artifacts: dict[str, Any]) -> list[ContradictionEvent]:
     if not mft or not mft.get("parse_ok"):
         return out
     val = mft["value"]
-    si = (val.get("si_timestamps") or {}).get("created")
-    fn = (val.get("fn_timestamps") or {}).get("created")
-    si_dt, fn_dt = _parse_ts(si or ""), _parse_ts(fn or "")
-    if si_dt and fn_dt and si_dt < fn_dt:
-        # SI predates FN => SI was rolled back. FN (trust 0.90) wins.
-        delta_days = (fn_dt - si_dt).days
-        if delta_days >= 1:
-            out.append(ContradictionEvent(
-                rule_id="R1",
-                technique="T1070.006 Indicator Removal: Timestomp",
-                summary=(f"$SI created {si} predates $FN created {fn} by "
-                         f"{delta_days}d — $SI timestamp was forged."),
-                trusted_source="MFTECmd:$FILE_NAME",
-                distrusted_source="MFTECmd:$STANDARD_INFORMATION",
-                trusted_value=fn, distrusted_value=si,
-                confidence=0.90 - 0.30,
-                pivot_hint="confirm real execution time via get_prefetch / get_amcache",
-                evidence_refs=mft.get("raw_cmd", []),
-            ))
+    si = val.get("si_timestamps") or {}
+    fn = val.get("fn_timestamps") or {}
+    refs = mft.get("raw_cmd", [])
+
+    def emit(summary: str, trusted_val, distrusted_val):
+        out.append(ContradictionEvent(
+            rule_id="R1",
+            technique="T1070.006 Indicator Removal: Timestomp",
+            summary=summary,
+            trusted_source="MFTECmd:$FILE_NAME",
+            distrusted_source="MFTECmd:$STANDARD_INFORMATION",
+            trusted_value=trusted_val, distrusted_value=distrusted_val,
+            confidence=0.90 - 0.30,
+            pivot_hint="confirm real execution time via get_prefetch / get_amcache",
+            evidence_refs=refs,
+        ))
+
+    # Signal A: $SI created predates $FN created (FN, trust 0.90, wins).
+    si_c, fn_c = _parse_ts(si.get("created") or ""), _parse_ts(fn.get("created") or "")
+    if si_c and fn_c and (fn_c - si_c).days >= 1:
+        emit(f"$SI created {si.get('created')} predates $FN created {fn.get('created')} "
+             f"by {(fn_c - si_c).days}d — $SI timestamp was forged.",
+             fn.get("created"), si.get("created"))
+        return out  # one finding per file is enough
+
+    # Signal B (real-data): $SI modified earlier than $SI created — physically
+    # impossible ordering, the classic touch/timestomp artifact when $FN is sparse.
+    si_m = _parse_ts(si.get("modified") or "")
+    if si_c and si_m and (si_c - si_m).days >= 1:
+        emit(f"$SI modified {si.get('modified')} precedes $SI created {si.get('created')} "
+             f"— impossible ordering, timestamps were rolled back.",
+             si.get("created"), si.get("modified"))
+        return out
+
+    # Signal C: MFTECmd's own heuristics.
+    if val.get("mftecmd_timestomped") or val.get("usec_zeros"):
+        flag = "Timestomped" if val.get("mftecmd_timestomped") else "uSecZeros"
+        emit(f"MFTECmd flagged {flag}=true on {val.get('path')} — manipulated timestamps.",
+             "$FN / MFTECmd heuristic", "$SI")
     return out
 
 

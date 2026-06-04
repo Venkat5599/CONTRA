@@ -27,3 +27,6 @@ Thumbs.db
 web/node_modules/
 web/dist/
 web/.playwright-mcp/
+
+# VPS creds never in repo
+.vpsenv
