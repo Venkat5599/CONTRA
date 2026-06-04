@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Lenis from "lenis";
 import type { Bundle } from "./types";
 import { ScrollProgress, AnimatedNumber, WordReveal, Magnetic } from "./motion";
@@ -32,46 +32,89 @@ function Up({ children, delay = 0 }: { children: React.ReactNode; delay?: number
   );
 }
 
-/* a numbered key-finding chapter */
-function Chapter({ n, kicker, title, stat, body, quote }: {
-  n: string; kicker: string; title: string[]; stat: string; body: string; quote: string;
-}) {
+interface Ch { n: string; kicker: string; title: string[]; stat: string; body: string; quote: string; }
+
+/* Sticky stacking card — pins at top; the next chapter scrolls up and covers it.
+   The outgoing card scales down + dims slightly for depth (the "deck" feel). */
+function StackedChapter({ ch, index, total }: { ch: Ch; index: number; total: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  // as the NEXT card covers this one, push this one back in z-depth
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.93]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.35]);
+  const isLast = index === total - 1;
+  const tint = index % 2 === 0 ? "bg-paper" : "bg-paper-2";
+
   return (
-    <section ref={ref} className="border-t border-graphite/15">
-      <div className="mx-auto max-w-[1180px] px-5 py-20 md:px-8 md:py-28">
-        <div className="flex items-start gap-6 md:gap-12">
-          <motion.span initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.8 }}
-            className="font-mono text-[15px] text-accent">{n}</motion.span>
-          <div className="flex-1">
-            <Bracket>{kicker}</Bracket>
-            <div className="mt-4">
-              {title.map((t, i) => (
-                <h3 key={i}
-                  className="font-display text-[8vw] font-semibold uppercase leading-[0.95] tracking-[-0.03em] text-graphite md:text-[3.4rem]">
-                  <WordReveal text={t} delay={i * 0.08} />
-                </h3>
-              ))}
-            </div>
-            <div className="mt-10 grid gap-8 md:grid-cols-[1.1fr_1fr]">
-              <div>
-                <div className="font-display text-[26px] font-semibold leading-snug text-graphite md:text-[30px]">{stat}</div>
-                <p className="mt-5 font-display text-[15px] leading-relaxed text-stone">{body}</p>
+    <div ref={ref} className="h-[100dvh]" style={{ zIndex: index + 1 }}>
+      <motion.div
+        style={{ scale: isLast ? 1 : scale, opacity: isLast ? 1 : opacity }}
+        className={`sticky top-0 flex h-[100dvh] items-center overflow-hidden border-t border-graphite/15 ${tint}`}>
+        <div className="mx-auto w-full max-w-[1180px] px-5 md:px-8">
+          <div className="flex items-start gap-6 md:gap-12">
+            <span className="mt-2 font-mono text-[15px] text-accent">{ch.n}</span>
+            <div className="flex-1">
+              <Bracket>{ch.kicker}</Bracket>
+              <div className="mt-5">
+                {ch.title.map((t, i) => (
+                  <h3 key={i}
+                    className="font-display text-[9vw] font-semibold uppercase leading-[0.92] tracking-[-0.03em] text-graphite md:text-[4rem]">
+                    <WordReveal text={t} delay={i * 0.08} />
+                  </h3>
+                ))}
               </div>
-              <div className="flex items-center">
-                <p className="border-l-2 border-accent pl-5 font-serif text-[22px] italic leading-snug text-graphite md:text-[26px]">
-                  "{quote}"
-                </p>
+              <div className="mt-10 grid gap-8 md:grid-cols-[1.1fr_1fr]">
+                <div>
+                  <div className="font-display text-[24px] font-semibold leading-snug text-graphite md:text-[30px]">{ch.stat}</div>
+                  <p className="mt-5 font-display text-[15px] leading-relaxed text-stone">{ch.body}</p>
+                </div>
+                <div className="flex items-center">
+                  <p className="border-l-2 border-accent pl-5 font-serif text-[22px] italic leading-snug text-graphite md:text-[26px]">
+                    "{ch.quote}"
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+          {/* progress dots */}
+          <div className="mt-12 flex gap-1.5">
+            {Array.from({ length: total }).map((_, i) => (
+              <span key={i} className="h-1 rounded-full transition-all duration-500"
+                style={{ width: i === index ? 24 : 8, background: i === index ? "var(--color-accent)" : "rgba(20,21,26,0.15)" }} />
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </div>
   );
 }
+
+const CHAPTERS: Ch[] = [
+  { n: "01", kicker: "the thesis", title: ["Most agents", "trust the output"],
+    stat: "Every other defender's agent runs a forensic tool and believes what it returns.",
+    body: "Timestomped dates, cleared logs, wiped binaries — taken at face value. The attacker's last act is lying to the tools, and a naive agent walks straight into the deception.",
+    quote: "An attacker rewrites a timestamp in seconds. They cannot rewrite live memory." },
+  { n: "02", kicker: "the core idea", title: ["Weighted by", "forge cost"],
+    stat: "Memory: 0.95. $FILE_NAME: 0.90. $STANDARD_INFORMATION: 0.30.",
+    body: "CONTRA ranks every artifact by how expensive it is for an attacker to forge. When two sources disagree, it believes the expensive one — and treats the cheap, contradicting source as the crime scene.",
+    quote: "The disagreement between sources isn't noise. It's the finding." },
+  { n: "03", kicker: "five contradictions", title: ["Anti-forensics", "mapped to MITRE"],
+    stat: "Timestomp · fileless · log-clear · wipe · prefetch-delete.",
+    body: "Five deterministic rules turn a source disagreement into a named technique: T1070.006, T1055, T1070.001, T1485, T1070.004. Detection is reproducible; the LLM only reasons about sequencing.",
+    quote: "Deterministic where it must be. Intelligent where it adds value." },
+  { n: "04", kicker: "accuracy", title: ["Precision 1.0", "zero false positives"],
+    stat: "Across attack and benign cases, stable over three runs (pass^3).",
+    body: "Validated end-to-end on real MFTECmd output from a real $MFT extracted on the SIFT VPS. Real data even hardened the rule — the impossible-ordering timestomp signal was forced by genuine output.",
+    quote: "Findings you can stand behind in court, traced to the exact command." },
+  { n: "05", kicker: "evidence integrity", title: ["Read-only by", "construction"],
+    stat: "dd, rm, --write, shell escape — all refused at the architecture.",
+    body: "The agent runs through a read-only surface that exposes only forensic tools. No destructive function exists. A prompt injection in the case data has nowhere to land — proven by a live bypass test.",
+    quote: "Not a prompt asking nicely. The destructive function simply isn't there." },
+  { n: "06", kicker: "autonomy", title: ["It catches", "its own lie"],
+    stat: "Self-correction is the whole game — and it's visible, live.",
+    body: "The agent reads an artifact, hits a contradiction, re-weights its belief, and pivots to confirm. Every step is logged with timestamps and token usage. Watch it happen in the console replay.",
+    quote: "Not a bigger model. A better way for the agent to doubt." },
+];
 
 export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; onLaunch: () => void }) {
   const agg = bundle?.aggregate;
@@ -175,42 +218,12 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
         </Up>
       </section>
 
-      {/* CHAPTERS */}
-      <Chapter n="01" kicker="the thesis"
-        title={["Most agents", "trust the output"]}
-        stat="Every other defender's agent runs a forensic tool and believes what it returns."
-        body="Timestomped dates, cleared logs, wiped binaries — taken at face value. The attacker's last act is lying to the tools, and a naive agent walks straight into the deception."
-        quote="An attacker rewrites a timestamp in seconds. They cannot rewrite live memory." />
-
-      <Chapter n="02" kicker="the core idea"
-        title={["Weighted by", "forge cost"]}
-        stat="Memory: 0.95. $FILE_NAME: 0.90. $STANDARD_INFORMATION: 0.30."
-        body="CONTRA ranks every artifact by how expensive it is for an attacker to forge. When two sources disagree, it believes the expensive one — and treats the cheap, contradicting source as the crime scene."
-        quote="The disagreement between sources isn't noise. It's the finding." />
-
-      <Chapter n="03" kicker="five contradictions"
-        title={["Anti-forensics", "mapped to MITRE"]}
-        stat="Timestomp · fileless · log-clear · wipe · prefetch-delete."
-        body="Five deterministic rules turn a source disagreement into a named technique: T1070.006, T1055, T1070.001, T1485, T1070.004. Detection is reproducible; the LLM only reasons about sequencing."
-        quote="Deterministic where it must be. Intelligent where it adds value." />
-
-      <Chapter n="04" kicker="accuracy"
-        title={["Precision 1.0", "zero false positives"]}
-        stat="Across attack and benign cases, stable over three runs (pass^3)."
-        body="Validated end-to-end on real MFTECmd output from a real $MFT extracted on the SIFT VPS. Real data even hardened the rule — the impossible-ordering timestomp signal was forced by genuine output."
-        quote="Findings you can stand behind in court, traced to the exact command." />
-
-      <Chapter n="05" kicker="evidence integrity"
-        title={["Read-only by", "construction"]}
-        stat="dd, rm, --write, shell escape — all refused at the architecture."
-        body="The agent runs through a read-only surface that exposes only forensic tools. No destructive function exists. A prompt injection in the case data has nowhere to land — proven by a live bypass test."
-        quote="Not a prompt asking nicely. The destructive function simply isn't there." />
-
-      <Chapter n="06" kicker="autonomy"
-        title={["It catches", "its own lie"]}
-        stat="Self-correction is the whole game — and it's visible, live."
-        body="The agent reads an artifact, hits a contradiction, re-weights its belief, and pivots to confirm. Every step is logged with timestamps and token usage. Watch it happen in the console replay."
-        quote="Not a bigger model. A better way for the agent to doubt." />
+      {/* CHAPTERS — sticky stacking deck */}
+      <div className="relative">
+        {CHAPTERS.map((ch, i) => (
+          <StackedChapter key={ch.n} ch={ch} index={i} total={CHAPTERS.length} />
+        ))}
+      </div>
 
       {/* METHODOLOGY */}
       <section className="border-t border-graphite/15 bg-graphite text-paper">
