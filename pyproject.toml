@@ -15,6 +15,7 @@ dev = ["pytest>=8.0"]
 
 [project.scripts]
 contra-mcp = "contra.mcp_server:main"
+contra-setup = "contra.install_desktop:main"
 contra-demo = "contra.demo_offline:main"
 contra-evals = "contra.eval.run_evals:main"
 contra-report = "contra.report:main"

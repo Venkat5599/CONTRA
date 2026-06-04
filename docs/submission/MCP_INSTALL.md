@@ -4,25 +4,29 @@
 > and ask your agent to find evil. **Zero setup** — it serves committed sample cases,
 > so you need no disk image, no VPS, no extra tooling.
 
-## 1. Install (one command)
+## 1. Install + register — two commands, no JSON editing
 
 ```bash
 pip install "git+https://github.com/Venkat5599/CONTRA.git"
-# this puts the `contra-mcp` server on your PATH
+contra-setup        # auto-configures Claude Desktop (finds the config, merges in CONTRA)
 ```
 
-(or clone + `pip install -e .` from the repo root.)
+Then **fully quit and reopen Claude Desktop**. That's it — `contra` appears in the tools
+list with 11 tools. `contra-setup` is non-destructive (keeps your other MCP servers) and
+uses the absolute path to the server, so there are no PATH issues.
 
-## 2. Register it in your MCP client
+- Remove it later: `contra-setup --remove`
+- Just see the config snippet: `contra-setup --print`
+
+## 2. Other clients (manual)
 
 ### Claude Code (CLI)
 ```bash
 claude mcp add contra contra-mcp
 ```
-Or just **open this repo in Claude Code** — it auto-detects the committed `.mcp.json`.
+Or open this repo in Claude Code — it auto-detects the committed `.mcp.json`.
 
-### Claude Desktop
-Add to `claude_desktop_config.json`:
+### Any MCP client / manual Desktop config
 ```json
 {
   "mcpServers": {
@@ -30,9 +34,6 @@ Add to `claude_desktop_config.json`:
   }
 }
 ```
-
-### Cursor / Cline / any MCP client
-Point it at the `contra-mcp` command (stdio transport).
 
 ## 3. Try it — ask your agent
 
