@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { motion } from "framer-motion";
 import type { Bundle } from "./types";
+
+// Spline 3D is heavy — lazy-load so it never blocks first paint or the rest of the page.
+const Spline = lazy(() => import("@splinetool/react-spline"));
+const SPLINE_SCENE = "https://prod.spline.design/aHL7oYzTTwp9O0Wy/scene.splinecode";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -49,10 +53,17 @@ export default function Landing({ bundle, onLaunch }: { bundle: Bundle | null; o
       </header>
 
       {/* hero */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0"
-          style={{ background: "radial-gradient(60rem 30rem at 70% -10%, rgba(214,69,46,0.10), transparent 60%), radial-gradient(50rem 40rem at 10% 120%, rgba(20,21,26,0.05), transparent 60%)" }} />
-        <div className="relative mx-auto max-w-[1180px] px-5 pb-20 pt-20 md:px-8 md:pb-28 md:pt-28">
+      <section className="relative min-h-[100dvh] overflow-hidden">
+        {/* Spline 3D background */}
+        <div className="absolute inset-0 z-0">
+          <Suspense fallback={null}>
+            <Spline scene={SPLINE_SCENE} className="!h-full !w-full" />
+          </Suspense>
+        </div>
+        {/* readability wash — keeps copy legible over the 3D scene */}
+        <div className="pointer-events-none absolute inset-0 z-[1]"
+          style={{ background: "linear-gradient(180deg, rgba(246,245,241,0.55) 0%, rgba(246,245,241,0.15) 35%, rgba(246,245,241,0.55) 75%, var(--color-paper) 100%), radial-gradient(60rem 30rem at 70% -10%, rgba(214,69,46,0.10), transparent 60%)" }} />
+        <div className="relative z-[2] mx-auto max-w-[1180px] px-5 pb-20 pt-24 md:px-8 md:pb-28 md:pt-32">
           <Up>
             <div className="mb-7 flex items-center gap-3">
               <span className="rounded-full border border-line bg-white/60 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-stone">
